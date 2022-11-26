@@ -1,6 +1,9 @@
 # %% [markdown]
-# This notebook samples arctic dem product and albedo from random sampling points
+# This python script samples arctic dem product and harmonized satellite 
+# albedo from random sampling points generated in previous step.
 # 
+# To do list:
+# Speed is limited using for loops. This should be definitely avoided.
 # 
 # Users should change the size of spatial window when extracting the pixel values. 
 
@@ -247,79 +250,80 @@ date_start = ee.Date.fromYMD(2009, 8, 16)
 date_end = ee.Date.fromYMD(2017, 3, 12)
 
 # %%
-for i in range(sampleN):
+for i in range(0, len(sampleList)):
 
-    print('The feature id is: %d out of %d' %(i, len(sampleList)))
-    
-    
-    aoi = ee.Geometry.Point(sampleList[i])
-    # Map.addLayer(aoi, {}, stationName)
-    
-    # arctic dem strip
-    arcticdemStrip = ee.ImageCollection('UMN/PGC/ArcticDEM/V3/2m') \
-                  .filterBounds(aoi) \
-                  .select('elevation') \
-                  .sort('system:time_start', True).map(demtool)
+  print('The feature id is: %d out of %d, %s' %(i, len(sampleList), pd.Timestamp.today()))
+  
+  
+  aoi = ee.Geometry.Point(sampleList[i])
+  # Map.addLayer(aoi, {}, stationName)
+  
+  # arctic dem strip
+  arcticdemStrip = ee.ImageCollection('UMN/PGC/ArcticDEM/V3/2m') \
+                .filterBounds(aoi) \
+                .select('elevation') \
+                .sort('system:time_start', True).map(demtool)
 
-    # create filter for image collection
-    colFilter = ee.Filter.And(
-        ee.Filter.geometry(aoi), # filterbounds not available on python api https://github.com/google/earthengine-api/issues/83
-        ee.Filter.date(date_start, date_end)
-        # ee.Filter.calendarRange(5, 9, 'month'),
-        # ee.Filter.lt('CLOUD_COVER', 50)
-    )
+  # create filter for image collection
+  colFilter = ee.Filter.And(
+      ee.Filter.geometry(aoi), # filterbounds not available on python api https://github.com/google/earthengine-api/issues/83
+      ee.Filter.date(date_start, date_end)
+      # ee.Filter.calendarRange(5, 9, 'month'),
+      # ee.Filter.lt('CLOUD_COVER', 50)
+  )
 
-    s2colFilter =  ee.Filter.And(
-        ee.Filter.geometry(aoi), # filterbounds not available on python api https://github.com/google/earthengine-api/issues/83
-        ee.Filter.date(date_start, date_end),
-        # ee.Filter.calendarRange(5, 9, 'month'),
-        ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 50)
-    )
+  s2colFilter =  ee.Filter.And(
+      ee.Filter.geometry(aoi), # filterbounds not available on python api https://github.com/google/earthengine-api/issues/83
+      ee.Filter.date(date_start, date_end),
+      # ee.Filter.calendarRange(5, 9, 'month'),
+      ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 50)
+  )
 
-    oliCol = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2') \
-                .filter(colFilter) \
-                .map(prepOli) \
-                .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
-    etmCol = ee.ImageCollection('LANDSAT/LE07/C02/T1_L2') \
-                .filter(colFilter) \
-                .map(prepEtm) \
-                .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
-    tmCol = ee.ImageCollection('LANDSAT/LT05/C02/T1_L2') \
-                .filter(colFilter) \
-                .map(prepEtm) \
-                .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
-    tm4Col = ee.ImageCollection('LANDSAT/LT04/C02/T1_L2') \
-                .filter(colFilter) \
-                .map(prepEtm) \
-                .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
-    s2Col = ee.ImageCollection('COPERNICUS/S2_SR') \
-                .filter(s2colFilter) \
-                .map(prepS2) \
-                .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
-    # landsatCol = etmCol.merge(tmCol)
-    landsatCol = oliCol.merge(etmCol).merge(tmCol).merge(tm4Col)
-    multiSat = landsatCol.merge(s2Col).sort('system:time_start', True).map(imRangeFilter) # // Sort chronologically in descending order.
+  oliCol = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2') \
+              .filter(colFilter) \
+              .map(prepOli) \
+              .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
+  etmCol = ee.ImageCollection('LANDSAT/LE07/C02/T1_L2') \
+              .filter(colFilter) \
+              .map(prepEtm) \
+              .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
+  tmCol = ee.ImageCollection('LANDSAT/LT05/C02/T1_L2') \
+              .filter(colFilter) \
+              .map(prepEtm) \
+              .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
+  tm4Col = ee.ImageCollection('LANDSAT/LT04/C02/T1_L2') \
+              .filter(colFilter) \
+              .map(prepEtm) \
+              .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
+  s2Col = ee.ImageCollection('COPERNICUS/S2_SR') \
+              .filter(s2colFilter) \
+              .map(prepS2) \
+              .select(['Blue', 'Green', 'Red', 'NIR', 'visnirAlbedo'])
+  # landsatCol = etmCol.merge(tmCol)
+  landsatCol = oliCol.merge(etmCol).merge(tmCol).merge(tm4Col)
+  multiSat = landsatCol.merge(s2Col).sort('system:time_start', True).map(imRangeFilter) # // Sort chronologically in descending order.
+  if multiSat.size().getInfo()==0:
+    continue
+  # export albedo as csv
+  pointAlbedo = multiSat.getRegion(aoi, 30).getInfo() # The number e.g. 500 is the buffer size
+  dfalbedo = ee_array_to_df(pointAlbedo, ['visnirAlbedo'])
+  dfalbedo["id"] = i
+  pointAlbedoFile = 'randomPoints/30m/albedo.csv'
+  
+  # export dem as csv
+  pointDEM = arcticdemStrip.getRegion(aoi, 30).getInfo()
+  pointEndtime = arcticdemStrip.aggregate_array("system:time_end").getInfo()
+  dfDEM = ee_array_to_df(pointDEM, ['elevation', 'slope', 'aspect', 'hillshade'])
+  dfDEM["time_end"] = pointEndtime
+  dfDEM["id"] = i
+  pointDEMFile = 'randomPoints/30m/dem.csv'
 
-    # export albedo as csv
-    pointAlbedo = multiSat.getRegion(aoi, 30).getInfo() # The number e.g. 500 is the buffer size
-    dfalbedo = ee_array_to_df(pointAlbedo, ['visnirAlbedo'])
-    dfalbedo["id"] = i
-    pointAlbedoFile = 'randomPoints/30m/albedo.csv'
-    
-    # export dem as csv
-    pointDEM = arcticdemStrip.getRegion(aoi, 30).getInfo()
-    pointEndtime = arcticdemStrip.aggregate_array("system:time_end").getInfo()
-    dfDEM = ee_array_to_df(pointDEM, ['elevation', 'slope', 'aspect', 'hillshade'])
-    dfDEM["time_end"] = pointEndtime
-    dfDEM["id"] = i
-    pointDEMFile = 'randomPoints/30m/dem.csv'
-
-    if i==0:
-        dfalbedo.dropna().to_csv(pointAlbedoFile, mode='w', index=False, header=True)
-        dfDEM.dropna().to_csv(pointDEMFile, mode='w', index=False, header=True)
-    else:
-        dfalbedo.dropna().to_csv(pointAlbedoFile, mode='a', index=False, header=False)
-        dfDEM.dropna().to_csv(pointDEMFile, mode='a', index=False, header=False)
+  if i==0:
+      dfalbedo.dropna().to_csv(pointAlbedoFile, mode='w', index=False, header=True)
+      dfDEM.dropna().to_csv(pointDEMFile, mode='w', index=False, header=True)
+  else:
+      dfalbedo.dropna().to_csv(pointAlbedoFile, mode='a', index=False, header=False)
+      dfDEM.dropna().to_csv(pointDEMFile, mode='a', index=False, header=False)
 
 
 # %%

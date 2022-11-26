@@ -1,3 +1,9 @@
+/*
+One way of generating random sampling points. It's efficient but kdoes not consider
+spatial auto correlation.
+*/
+
+
 var greenlandmask = ee.Image('OSU/GIMP/2000_ICE_OCEAN_MASK')
                    .select('ice_mask').eq(1); // #'ice_mask', 'ocean_mask'
 var arcticDEM = ee.Image('UMN/PGC/ArcticDEM/V3/2m_mosaic');

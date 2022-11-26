@@ -1,11 +1,18 @@
 /*
+This is a script to generate random sampling points with buffer to avoid 
+the inluence of spatial autocorrelation.
+
+Shunan Feng (shunan.feng@envs.au.dk)
+*/
+
+
+
+/*
 initialize random sampler
 */
-var cellSize = 500,
-    seed = 1,
+var cellSize = 500, //size of the sample grid
+    seed = 1, 
     projcrs = "EPSG:3411"; //in WGS 84 / EPSG Greenland Polar Stereographic
-
-
 
                
 var arcticDEM = ee.Image('UMN/PGC/ArcticDEM/V3/2m_mosaic');
@@ -40,18 +47,18 @@ var pointsWithBuffer = function(proj, region, seed, strict, elamask) {
   // leaving only those cells have an odd x and y coordinates.  
   // Cell coordinates are centered on the 1/2 pixel. The double not is to avoid float comparison issues.
   var mask = ee.Image.pixelCoordinates(proj)
-      .expression('!((b("x") + 0.5) % 2 != 0 || (b("y") + 0.5) % 2 != 0)')
-  var strictGrid = looseGrid.updateMask(mask)
+      .expression('!((b("x") + 0.5) % 2 != 0 || (b("y") + 0.5) % 2 != 0)');
+  var strictGrid = looseGrid.updateMask(mask);
 
   // Pick a grid based on the 'strict' option.
-  var cells = ee.Image(ee.Algorithms.If(strict, strictGrid, looseGrid)).clip(region).reproject(proj)
+  var cells = ee.Image(ee.Algorithms.If(strict, strictGrid, looseGrid)).clip(region).reproject(proj);
   // Uncomment to visuaize cells.
-  // Map.addLayer(cells.randomVisualizer())
+  // Map.addLayer(cells.randomVisualizer());
   
   // Generate another random image and select the maximum random value 
   // in each grid cell as the sample point.
-  var random = ee.Image.random(seed).multiply(1000000).int()
-  var maximum = cells.addBands(random).reduceConnectedComponents(ee.Reducer.max())
+  var random = ee.Image.random(seed).multiply(1000000).int();
+  var maximum = cells.addBands(random).reduceConnectedComponents(ee.Reducer.max());
   
   // Find all the points that are local maximums and convert to a FeatureCollection.
   var points = random.eq(maximum).selfMask()
@@ -91,7 +98,7 @@ var region = ee.FeatureCollection("projects/ee-deeppurple/assets/icePoly");
 var grid = randomOffset(ee.Projection(projcrs).atScale(cellSize), seed);
 
 // Map.addLayer(pointsWithBuffer(grid, region, seed, true, elamask), {color: '#b22222'}, 'Strict')
-Map.addLayer(displayGrid(grid, elamask).clip(region), {palette: ['#92222244']}, 'Strict Grid')
+Map.addLayer(displayGrid(grid, elamask).clip(region), {palette: ['#92222244']}, 'Strict Grid');
 // print(pointsWithBuffer(grid, region, seed, true, elamask).size(), " strict points, spaced ", grid.nominalScale(), " meters apart.")
 
 // // Make the background map dark.
@@ -102,7 +109,9 @@ Map.addLayer(displayGrid(grid, elamask).clip(region), {palette: ['#92222244']}, 
 //     { 'featureType': 'water',  'stylers': [ { 'color': '#404040' } ] }
 //   ]
 // })
-// Export an ee.FeatureCollection as an Earth Engine asset.
+
+
+// Export an ee.FeatureCollection as an Earth Engine asset in case the sampling points size is too big.
 Export.table.toAsset({
     collection: pointsWithBuffer(grid, region, seed, true, elamask),
     description:'randomELA2000',
