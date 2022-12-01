@@ -1,7 +1,7 @@
 
 
 %% load data
-topodf = readtable("H:\AU\randomPoints\basin\SW.csv");
+topodf = readtable("H:\AU\topography\basin\SW.csv");
 index = topodf.month > 6 & topodf.month < 9;
 topodf = topodf(index, :);
 
@@ -14,7 +14,8 @@ slope = normalize(topodf.slope, 'range', [-1 1]);
 aspect = normalize(topodf.aspect, 'range', [-1 1]);
 elevation = normalize(topodf.elevation, 'range', [-1 1]);
 
-df = table(slope, aspect, elevation);
+% df = table(slope, aspect, elevation);
+df = [slope, aspect, elevation];
 
 [trainId,valId,testId] = dividerand(length(topodf.iceclass), 0.6, 0.2, 0.2);
 
@@ -29,30 +30,23 @@ valiLabel = topodf.iceclass(valId);
 
 %% training model
 
-miniBatchSize = 27;
 
-options = trainingOptions("adam", ...
-    MiniBatchSize=miniBatchSize, ...
-    MaxEpochs=15, ...
-    SequencePaddingDirection="left", ...
+
+options = trainingOptions("adam", ... 
     ValidationData={valiData, valiLabel}, ...
     Plots="training-progress", ...
     Verbose=0);
 
+numFeatures = 3;
+numClasses = 2;
+
 filterSize = 3;
 numFilters = 32;
 
-layers = [ ...
-    sequenceInputLayer(3)
-    convolution1dLayer(filterSize,numFilters,Padding="causal")
-    reluLayer
-    layerNormalizationLayer
-    convolution1dLayer(filterSize,2*numFilters,Padding="causal")
-    reluLayer
-    layerNormalizationLayer
-    globalAveragePooling1dLayer
-    fullyConnectedLayer(2)
-    softmaxLayer
-    classificationLayer];
+layers = [
+    sequenceInputLayer(numFeatures)
+    lstmLayer(128)
+    fullyConnectedLayer(numFeatures)
+    regressionLayer];
 
 mynet = trainNetwork(trainData, trainLabel, layers, options);

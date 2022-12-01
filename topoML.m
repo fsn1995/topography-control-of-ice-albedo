@@ -1,7 +1,8 @@
 
 
 %% load data
-topodf = readtable("H:\AU\randomPoints\basin\SW.csv");
+topodf = readtable("H:\AU\topography\basin\SW.csv");
+% topodf = readtable("/data/shunan/data/topography/basin/SW.csv");
 index = topodf.month > 6 & topodf.month < 9;
 topodf = topodf(index, :);
 
@@ -17,6 +18,7 @@ elevation = normalize(topodf.elevation, 'range', [-1 1]);
 % aspect = gpuArray(topodf.aspect);
 % elevation = gpuArray(topodf.elevation);
 df = table(gpuArray(slope), gpuArray(aspect), gpuArray(elevation));
+% df = table(slope, aspect, elevation);
 % [coeff,score,latent,tsquared,explained,mu] = pca([elevation aspect slope]);
 % df = table(score(:,1), score(:,2));
 
@@ -34,76 +36,84 @@ testLabel = topodf.iceclass(testId);
 
 
 %% training model
-options = struct("Optimizer","asha");
-[Mdl,OptimizationResults] = fitcauto(trainData, trainLabel, "Learners","auto",...
-    "HyperparameterOptimizationOptions",options);
+% options = struct("Optimizer","asha");
+% [Mdl,OptimizationResults] = fitcauto(trainData, trainLabel, "Learners","auto",...
+%     "HyperparameterOptimizationOptions",options);
+% 
+% mdlPred = string(predict(Mdl, testData));
+% mdlLoss = loss(Mdl, testData, testLabel);
+% fprintf("model loss rate is: %.4f \n", mdlLoss);
+% figure;
+% confusionchart(testLabel, mdlPred);
 
-mdlPred = string(predict(Mdl, testData));
-mdlLoss = loss(Mdl, testData, testLabel);
+%% knn
+fprintf("knn \n")
+mdl = fitcknn(trainData, trainLabel,"OptimizeHyperparameters","auto");
+
+mdlPred = string(predict(mdl, testData));
+mdlLoss = loss(mdl, testData, testLabel);
 fprintf("model loss rate is: %.4f \n", mdlLoss);
 figure;
 confusionchart(testLabel, mdlPred);
+title("cknn");
 
-% %% knn
-% mdl = fitcknn(trainData, trainLabel, "NumNeighbors", 5);
-% 
-% mdlPred = string(predict(mdl, testData));
-% mdlLoss = loss(mdl, testData, testLabel);
-% fprintf("model loss rate is: %.4f \n", mdlLoss);
-% figure;
-% confusionchart(testLabel, mdlPred);
-% title("cknn");
-% 
-% %% decision tree
-% mdl = fitctree(trainData, trainLabel, 'OptimizeHyperparameters','auto');
-% 
-% mdlPred = string(predict(mdl, testData));
-% mdlLoss = loss(mdl, testData, testLabel);
-% fprintf("model loss rate is: %.4f \n", mdlLoss);
-% figure;
-% confusionchart(testLabel, mdlPred);
-% title("tree");
-% 
-% %% Naïve Bayes
-% mdl = fitcnb(trainData, trainLabel);
-% 
-% mdlPred = string(predict(mdl, testData));
-% mdlLoss = loss(mdl, testData, testLabel);
-% fprintf("model loss rate is: %.4f \n", mdlLoss);
-% figure;
-% confusionchart(testLabel, mdlPred);
-% title("Naïve Bayes");
-% 
-% %% neural network
-% mdl = fitcnet(trainData, trainLabel,"LayerSizes",[35 20]);
-% 
-% mdlPred = string(predict(mdl, testData));
-% mdlLoss = loss(mdl, testData, testLabel);
-% fprintf("model loss rate is: %.4f \n", mdlLoss);
-% figure;
-% confusionchart(testLabel, mdlPred);
-% title("neural network");
-% 
-% %% svm
-% mdl = fitcsvm(trainData, trainLabel);
-% 
-% mdlPred = string(predict(mdl, testData));
-% mdlLoss = loss(mdl, testData, testLabel);
-% fprintf("model loss rate is: %.4f \n", mdlLoss);
-% figure;
-% confusionchart(testLabel, mdlPred);
-% title("svm");
-% 
-% %% random forest
-% t = templateTree('NumVariablesToSample','all',...
-%     'PredictorSelection','interaction-curvature','Surrogate','on');
-% 
+%% decision tree
+fprintf("tree \n")
+mdl = fitctree(trainData, trainLabel, 'OptimizeHyperparameters','auto');
+
+mdlPred = string(predict(mdl, testData));
+mdlLoss = loss(mdl, testData, testLabel);
+fprintf("model loss rate is: %.4f \n", mdlLoss);
+figure;
+confusionchart(testLabel, mdlPred);
+title("tree");
+
+%% Naïve Bayes
+fprintf("Naïve Bayes \n")
+mdl = fitcnb(trainData, trainLabel, "OptimizeHyperparameters","auto");
+
+mdlPred = string(predict(mdl, testData));
+mdlLoss = loss(mdl, testData, testLabel);
+fprintf("model loss rate is: %.4f \n", mdlLoss);
+figure;
+confusionchart(testLabel, mdlPred);
+title("Naïve Bayes");
+
+%% neural network
+fprintf("neural network \n")
+mdl = fitcnet(trainData, trainLabel,"OptimizeHyperparameters","auto"); %"LayerSizes",[35 20]
+
+mdlPred = string(predict(mdl, testData));
+mdlLoss = loss(mdl, testData, testLabel);
+fprintf("model loss rate is: %.4f \n", mdlLoss);
+figure;
+confusionchart(testLabel, mdlPred);
+title("neural network");
+
+%% svm
+fprintf("svm \n")
+mdl = fitcsvm(trainData, trainLabel,"OptimizeHyperparameters","auto");
+
+mdlPred = string(predict(mdl, testData));
+mdlLoss = loss(mdl, testData, testLabel);
+fprintf("model loss rate is: %.4f \n", mdlLoss);
+figure;
+confusionchart(testLabel, mdlPred);
+title("svm");
+
+%% random forest
+fprintf("RF \n")
+t = templateTree('NumVariablesToSample','all',...
+    'PredictorSelection','interaction-curvature','Surrogate','on');
+
 % mdl = fitcensemble(trainData, trainLabel, 'Method','Bag',...
 %     'NumLearningCycles',200, 'Learners',t);
-% 
-% mdlPred = string(predict(mdl, testData));
-% mdlLoss = loss(mdl, testData, testLabel);
-% fprintf("model loss rate is: %.4f \n", mdlLoss);
-% figure;
-% confusionchart(testLabel, mdlPred);
-% title("rf");
+mdl = fitcensemble(trainData, trainLabel,"OptimizeHyperparameters", "auto");
+
+mdlPred = string(predict(mdl, testData));
+mdlLoss = loss(mdl, testData, testLabel);
+fprintf("model loss rate is: %.4f \n", mdlLoss);
+figure;
+confusionchart(testLabel, mdlPred);
+title("rf");
+
