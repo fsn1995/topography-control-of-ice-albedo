@@ -1,9 +1,10 @@
 #%%
-import vaex as vx
+# import vaex as vx
 import pandas as pd
 import numpy as np
 import geopandas as gpd
-
+import seaborn as sns
+import matplotlib.pyplot as plt
 '''
 DEM
 '''
@@ -36,8 +37,8 @@ for i in range(len(basinpoly.SUBREGION1)):
 
 df.to_csv("/data/shunan/data/topography/dem.csv", index=False, mode="w")
 
-dfvx = vx.from_pandas(df)
-dfvx.export_hdf5("/data/shunan/data/topography/dem.hdf5", progress=True)
+# dfvx = vx.from_pandas(df)
+# dfvx.export_hdf5("/data/shunan/data/topography/dem.hdf5", progress=True)
 
 '''
 Albedo
@@ -70,8 +71,8 @@ for i in range(len(basinpoly.SUBREGION1)):
 
 df.to_csv("/data/shunan/data/topography/albedo.csv", index=False, mode="w")
 
-dfvx = vx.from_pandas(df)
-dfvx.export_hdf5("/data/shunan/data/topography/albedo.hdf5", progress=True)
+# dfvx = vx.from_pandas(df)
+# dfvx.export_hdf5("/data/shunan/data/topography/albedo.hdf5", progress=True)
 
 '''
 join dem and albedo
@@ -83,13 +84,17 @@ dfdem["datetime"] = pd.to_datetime(dfdem.time_end, unit="ms")
 dfalbedo["datetime"] = pd.to_datetime(dfalbedo.time, unit="ms")
 
 uniquei = dfdem.id.unique()
-# %%
+# %% join by datetime
+
+randomPoints = gpd.read_file("shp/randamSample.shp")
+
 for i in uniquei:
     print("Processing No. %d" % i)
     index = dfdem.id == i
     dfdemsub = dfdem[index]
     index = dfalbedo.id == i
     dfalbedosub = dfalbedo[index]
+    dfalbedosub["dist"] = randomPoints.iloc[i].NEAR_DIST
 
     dfmerge = pd.merge_asof(
         dfalbedosub.sort_values('datetime'), 
@@ -98,7 +103,7 @@ for i in uniquei:
         allow_exact_matches=False, 
         tolerance=pd.Timedelta(days=3),
         direction='nearest'
-    ).dropna()
+    )#.dropna()
     dfmerge = dfmerge.drop(columns=['datetime', 'geometry_x', 'longitude_y',
                                     'latitude_y','id_y', 'basin_y', 'geometry_y'])
     dfmerge = dfmerge.rename(columns={
@@ -109,11 +114,36 @@ for i in uniquei:
     })                    
                 
     if i == 0:
-        dfmerge.to_csv("/data/shunan/data/topography/topomerge1.csv", 
+        dfmerge.to_csv("/data/shunan/data/topography/topomerge.csv", 
                         mode="w", index=False, header=True)
     else:
-        dfmerge.to_csv("/data/shunan/data/topography/topomerge1.csv", 
+        dfmerge.to_csv("/data/shunan/data/topography/topomerge.csv", 
                         mode="a", index=False, header=False)
+
+
+#%% get montly average
+df = pd.read_csv("/data/shunan/data/topography/topomerge.csv")
+df["datetime"] = pd.to_datetime(df.time_x, unit="ms")
+df["year"] = df.datetime.dt.year
+df["month"] = df.datetime.dt.month
+
+
+index = (df.albedo < 0.65) & (df.elevation > 0) # keep only ice surface
+df = df[index]
+
+#%%
+index = df.basin.unique()
+for i in index:
+    print(i)
+    dfbasin = df[df.basin == i].groupby(["id", "year", "month"]).mean()
+    dfbasin["basin"] = i
+    dfbasin.to_csv("/data/shunan/data/topography/basin/" + i + ".csv", mode="w")
+    
+    dfbasin = df[df.basin == i]
+    monthindex = (dfbasin.month>6) & (dfbasin.month<9)
+    dfbasin = dfbasin[monthindex].groupby(["id", "year"]).mean()
+    dfbasin["basin"] = i
+    dfbasin.to_csv("/data/shunan/data/topography/basin/" + i + "_annual.csv", mode="w")
 
 
 # %%
