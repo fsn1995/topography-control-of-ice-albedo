@@ -2,7 +2,7 @@
 
 %% load data
 % topodf = readtable("H:\AU\topography\basin\SW_annual.csv");
-topodf = readtable("/data/shunan/data/topography/basin/SW_annual.csv");
+topodf = readtable("/data/shunan/data/topography/basin/SE_annual.csv");
 
 % topodf.distance = topodf.dist / 1000;
 topodf.iceclass = repmat("bare ice", length(topodf.albedo) , 1);
@@ -13,9 +13,10 @@ topodf.iceclass(index) = repmat("dark ice", sum(index) , 1);
 slope = normalize(topodf.slope, 'range', [-1 1]);
 aspect = normalize(topodf.aspect, 'range', [-1 1]);
 elevation = normalize(topodf.elevation, 'range', [-1 1]);
+dist = normalize(topodf.dist, 'range', [-1 1]);
 
 % df = table(gpuArray(slope), gpuArray(aspect), gpuArray(elevation));
-df = table(slope, aspect, elevation);
+df = table(slope, aspect, elevation, dist);
 
 cvpt = cvpartition(topodf.iceclass, "HoldOut", 0.3);
 
@@ -30,11 +31,11 @@ testData = df(testId,:);
 testLabel = topodf.iceclass(testId);
 
 %% pca analysis
-[coeff,score,latent,tsquared,explained,mu] = pca([elevation aspect slope]);
+[coeff,score,latent,tsquared,explained,mu] = pca([elevation aspect slope dist]);
 figure; 
-biplot(coeff(:,1:2),'scores',score(:,1:2),'varlabels',{'elevation','aspect','slope'});
+biplot(coeff(:,1:2),'scores',score(:,1:2),'varlabels',{'elevation','aspect','slope', 'dist'});
 figure;
-pareto(explained, {'elevation','aspect','slope'}, 1)
+pareto(explained, {'elevation','aspect','slope', 'distance'}, 1)
 %% training model
 options = struct("Optimizer","asha", "UseParallel",true);
 [Mdl,OptimizationResults] = fitcauto(trainData, trainLabel, "Learners","auto",...

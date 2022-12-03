@@ -130,8 +130,130 @@ sns.boxplot(
 plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
 ax.set(ylabel="", xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')' )
 fig.savefig("print/basin/box_aspe.png", dpi=300, bbox_inches="tight")
-#%%
 
+#%%
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+df["distance"] = df.dist/1000
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+df["tan"] = df.elevation / df.dist
+df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+
+dfvx = df[index]
+dfvx = vx.from_pandas(dfvx)
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+plt.xlim(0,70)
+plt.ylim(0,90)
+dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
+                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+plt.xlim(0,50)
+plt.ylim(0,2000)
+dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
+fig.savefig("print/basin/SW_dist_elev.png", dpi=300, bbox_inches="tight")
+
+
+dfvx = df[~index]
+dfvx = vx.from_pandas(dfvx)    
+fig, ax = plt.subplots(figsize=(6,5))   
+ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+plt.xlim(0, 70)
+plt.ylim(0, 90)
+dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
+                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+plt.xlim(0,100)
+plt.ylim(0,2000)
+dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+                    xlabel="distance (km)", ylabel="elevation (m)")
+
+#%%
+df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
+df["distance"] = df.dist/1000
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+df["tan"] = df.elevation / df.dist
+df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+
+dfvx = df[index]
+dfvx = vx.from_pandas(dfvx)
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
+plt.xlim(0,70)
+plt.ylim(0,30)
+dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
+                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SE", xy=(0.8, 0.1),  xycoords='axes fraction')
+plt.xlim(0,50)
+plt.ylim(0,2000)
+dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
+fig.savefig("print/basin/SE_dist_elev.png", dpi=300, bbox_inches="tight")
+
+
+dfvx = df[~index]
+dfvx = vx.from_pandas(dfvx)    
+fig, ax = plt.subplots(figsize=(6,5))   
+ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
+plt.xlim(0, 70)
+plt.ylim(0, 30)
+dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
+                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SE", xy=(0.8, 0.1),  xycoords='axes fraction')
+plt.xlim(0,100)
+plt.ylim(0,2000)
+dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+                    xlabel="distance (km)", ylabel="elevation (m)")
+
+
+#%%
+# df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
+# df["distance"] = df.dist/1000
+# index = df.albedo < 0.45 
+# df["ice_class"] = "bare ice"
+# df.ice_class[index] = "dark ice"
+
+# sns.histplot(data=df, x="distance", y="elevation", hue="ice_class")
+
+# g = sns.JointGrid(data=df, x="distance", y="slope", hue="ice_class")
+# g.plot_joint(sns.scatterplot, alpha=.3, s=50,)
+# g.plot_marginals(sns.boxplot)
+
+# #%%
+# g = sns.PairGrid(df, hue="ice_class", vars=["elevation", "slope", "aspect", "distance"])
+# g.map_diag(sns.histplot)
+# g.map_offdiag(sns.histplot)
+# g.add_legend()
+
+# # sns.pairplot(
+#     data=df,
+#     hue="ice_class",
+#     vars={"elevation", "slope", "aspect", "distance"}
+# )
+# sns.displot(
+#     data=df,
+#     x="distance",
+#     y="slope",
+#     hue="ice_class",
+
+# )
+
+#%%
 
 # def topo_violin_plot(df, min_month, max_month, basin):
 #     index = (df.month>min_month) & (df.month<max_month)
