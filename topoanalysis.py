@@ -132,94 +132,213 @@ ax.set(ylabel="", xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')' )
 fig.savefig("print/basin/box_aspe.png", dpi=300, bbox_inches="tight")
 
 #%%
+'''
+South GrIS statistics
+'''
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
+df["distance"] = df.dist/1000
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+
+print("SW bare ice: \n")
+index = (df.basin=="SW") & (df.ice_class == "bare ice")
+df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="w")
+print("SW dark ice: \n")
+index = (df.basin=="SW") & (df.ice_class == "dark ice")
+df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="a")
+print("SE bare ice: \n")
+index = (df.basin=="SE") & (df.ice_class == "bare ice")
+df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="a")
+print("SE dark ice: \n")
+index = (df.basin=="SE") & (df.ice_class == "dark ice")
+df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="a")
+
+#%%
+'''
+play with dark ice at SW
+'''
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+df["distance"] = df.dist/1000
+
+df = df[df.albedo < 0.45]
+df["tan"] = df.elevation / df.dist
+df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+
+dfvx = vx.from_pandas(df)
+
+fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+ax.axvline(6.02642477064999, ls='--', linewidth=3)
+# ax.axhline(673.3710066, ls='--', linewidth=3)
+plt.xlim(0,90)
+plt.ylim(0,90)
+dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+fig.savefig("print/basin/SW_dark_dist_slop.png", dpi=300, bbox_inches="tight")
+
+fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+ax.axvline(6.02642477064999, ls='--', linewidth=3)
+# ax.axhline(673.3710066, ls='--', linewidth=3)
+plt.xlim(0,90)
+plt.ylim(0,2000)
+dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
+fig.savefig("print/basin/SW_dark_dist_elev.png", dpi=300, bbox_inches="tight")
+
+
+fig, ax = plt.subplots(figsize=(6,5))   
+# ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+plt.xlim(0, 90)
+plt.ylim(0, 360)
+dfvx.viz.heatmap('distance', 'aspect', what=np.log(vx.stat.count()), show=True,
+                  xlabel="distance (km)", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
+fig.savefig("print/basin/SW_dark_dist_aspe.png", dpi=300, bbox_inches="tight")
+
+
+#%%
+'''slope and ice albedo'''
+
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
 df["distance"] = df.dist/1000
 index = df.albedo < 0.45 
 df["ice_class"] = "bare ice"
 df.ice_class[index] = "dark ice"
-df["tan"] = df.elevation / df.dist
-df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
 
-dfvx = df[index]
-dfvx = vx.from_pandas(dfvx)
+index = df.distance> 6.02642477064999
+df["dist_class"] = 'margin'
+df.dist_class[index] = 'inland'
 
-fig, ax = plt.subplots(figsize=(6,5))
-ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
-plt.xlim(0,70)
-plt.ylim(0,90)
-dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
-                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
-
-fig, ax = plt.subplots(figsize=(6,5))
-ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-plt.xlim(0,50)
-plt.ylim(0,2000)
-dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
-                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
-fig.savefig("print/basin/SW_dist_elev.png", dpi=300, bbox_inches="tight")
-
-
-dfvx = df[~index]
-dfvx = vx.from_pandas(dfvx)    
-fig, ax = plt.subplots(figsize=(6,5))   
-ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
-plt.xlim(0, 70)
-plt.ylim(0, 90)
-dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
-                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
-
-fig, ax = plt.subplots(figsize=(6,5))
-ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-plt.xlim(0,100)
-plt.ylim(0,2000)
-dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
-                    xlabel="distance (km)", ylabel="elevation (m)")
+fig, ax = plt.subplots(figsize=(6,3))
+sns.boxplot(
+    data=df,
+    x="slope",
+    y="dist_class",
+    hue="ice_class"
+)
+ax.set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="")
+plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
+fig.savefig("print/basin/SW_slop_distclass.png", dpi=300, bbox_inches="tight")
 
 #%%
-df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
-df["distance"] = df.dist/1000
-index = df.albedo < 0.45 
-df["ice_class"] = "bare ice"
-df.ice_class[index] = "dark ice"
-df["tan"] = df.elevation / df.dist
-df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+# fig, ax = plt.subplots(figsize=(6,5))
+# # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+# # ax.axvline(6.02642477064999, ls='--', linewidth=3)
+# plt.xlim(0,90)
+# plt.ylim(0,2000)
+# dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+#                  vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
+# fig.savefig("print/basin/SW_bare_dist_elev.png", dpi=300, bbox_inches="tight")
 
-dfvx = df[index]
-dfvx = vx.from_pandas(dfvx)
+# fig, ax = plt.subplots(figsize=(6,5))
+# # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+# ax.axvline(6.02642477064999, ls='--', linewidth=3)
+# plt.xlim(0,90)
+# plt.ylim(0,90)
+# dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
+#                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
+# fig.savefig("print/basin/SW_bare_dist_slop.png", dpi=300, bbox_inches="tight")
 
-fig, ax = plt.subplots(figsize=(6,5))
-ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
-plt.xlim(0,70)
-plt.ylim(0,30)
-dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
-                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+# index = df.distance> 6.02642477064999
+# df["dist_class"] = 'margin'
+# df.dist_class[index] = 'inland'
+# fig, ax = plt.subplots(figsize=(6,5))
+# sns.boxplot(
+#     data=df,
+#     x="slope",
+#     y="dist_class"
+# )
+
+#%%
+# df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+# df["distance"] = df.dist/1000
+# index = df.albedo < 0.45 
+# df["ice_class"] = "bare ice"
+# df.ice_class[index] = "dark ice"
+# df["tan"] = df.elevation / df.dist
+# df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+
+# dfvx = df[index]
+# dfvx = vx.from_pandas(dfvx)
+
+# fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+# plt.xlim(0,70)
+# plt.ylim(0,90)
+# dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
+#                   vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+
+# fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+# plt.xlim(0,50)
+# plt.ylim(0,2000)
+# dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+#                  vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
+# fig.savefig("print/basin/SW_dist_elev.png", dpi=300, bbox_inches="tight")
 
 
-fig, ax = plt.subplots(figsize=(6,5))
-ax.annotate("SE", xy=(0.8, 0.1),  xycoords='axes fraction')
-plt.xlim(0,50)
-plt.ylim(0,2000)
-dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
-                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
-fig.savefig("print/basin/SE_dist_elev.png", dpi=300, bbox_inches="tight")
+# dfvx = df[~index]
+# dfvx = vx.from_pandas(dfvx)    
+# fig, ax = plt.subplots(figsize=(6,5))   
+# ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+# plt.xlim(0, 70)
+# plt.ylim(0, 90)
+# dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
+#                   vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
+
+# fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+# plt.xlim(0,100)
+# plt.ylim(0,2000)
+# dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+#                     xlabel="distance (km)", ylabel="elevation (m)")
+
+# #%%
+# df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
+# df["distance"] = df.dist/1000
+# index = df.albedo < 0.45 
+# df["ice_class"] = "bare ice"
+# df.ice_class[index] = "dark ice"
+# df["tan"] = df.elevation / df.dist
+# df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+
+# dfvx = df[index]
+# dfvx = vx.from_pandas(dfvx)
+
+# fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
+# plt.xlim(0,70)
+# plt.ylim(0,30)
+# dfvx.viz.heatmap('distance', 'arctan', what=np.log(vx.stat.count()), show=True,
+#                   vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
 
 
-dfvx = df[~index]
-dfvx = vx.from_pandas(dfvx)    
-fig, ax = plt.subplots(figsize=(6,5))   
-ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
-plt.xlim(0, 70)
-plt.ylim(0, 30)
-dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
-                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
+# fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SE", xy=(0.8, 0.1),  xycoords='axes fraction')
+# plt.xlim(0,50)
+# plt.ylim(0,2000)
+# dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+#                  vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m)")
+# fig.savefig("print/basin/SE_dist_elev.png", dpi=300, bbox_inches="tight")
 
-fig, ax = plt.subplots(figsize=(6,5))
-ax.annotate("SE", xy=(0.8, 0.1),  xycoords='axes fraction')
-plt.xlim(0,100)
-plt.ylim(0,2000)
-dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
-                    xlabel="distance (km)", ylabel="elevation (m)")
 
+# dfvx = df[~index]
+# dfvx = vx.from_pandas(dfvx)    
+# fig, ax = plt.subplots(figsize=(6,5))   
+# ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
+# plt.xlim(0, 70)
+# plt.ylim(0, 30)
+# dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
+#                   vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
+
+# fig, ax = plt.subplots(figsize=(6,5))
+# ax.annotate("SE", xy=(0.8, 0.1),  xycoords='axes fraction')
+# plt.xlim(0,100)
+# plt.ylim(0,2000)
+# dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+#                     xlabel="distance (km)", ylabel="elevation (m)")
 
 #%%
 # df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
