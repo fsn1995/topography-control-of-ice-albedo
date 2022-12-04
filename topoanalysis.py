@@ -1,4 +1,4 @@
-#%%
+#%% import
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ import numpy as np
 sns.set_theme(style="darkgrid", font="Arial", font_scale=2)
 
 
-#%%
+#%% 
 '''
 topo plot by basin
 '''
@@ -133,30 +133,6 @@ fig.savefig("print/basin/box_aspe.png", dpi=300, bbox_inches="tight")
 
 #%%
 '''
-South GrIS statistics
-'''
-df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
-df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
-df["distance"] = df.dist/1000
-index = df.albedo < 0.45 
-df["ice_class"] = "bare ice"
-df.ice_class[index] = "dark ice"
-
-print("SW bare ice: \n")
-index = (df.basin=="SW") & (df.ice_class == "bare ice")
-df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="w")
-print("SW dark ice: \n")
-index = (df.basin=="SW") & (df.ice_class == "dark ice")
-df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="a")
-print("SE bare ice: \n")
-index = (df.basin=="SE") & (df.ice_class == "bare ice")
-df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="a")
-print("SE dark ice: \n")
-index = (df.basin=="SE") & (df.ice_class == "dark ice")
-df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="a")
-
-#%%
-'''
 play with dark ice at SW
 '''
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
@@ -220,8 +196,19 @@ sns.boxplot(
 )
 ax.set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="")
 plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
+plt.yticks(rotation="vertical", ha="right")
 fig.savefig("print/basin/SW_slop_distclass.png", dpi=300, bbox_inches="tight")
 
+fig, ax = plt.subplots(figsize=(6,3))
+sns.boxplot(
+    data=df,
+    x="aspect",
+    y="dist_class",
+    hue="ice_class"
+)
+ax.set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="")
+plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
+plt.yticks(rotation="vertical", ha="right")
 #%%
 # fig, ax = plt.subplots(figsize=(6,5))
 # # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
