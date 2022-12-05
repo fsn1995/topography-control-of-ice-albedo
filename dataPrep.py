@@ -3,8 +3,11 @@
 import pandas as pd
 import numpy as np
 import geopandas as gpd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import os
+import glob
+import tarfile
+#%%
+
 '''
 DEM
 '''
@@ -146,4 +149,20 @@ for i in index:
     dfbasin.to_csv("/data/shunan/data/topography/basin/" + i + "_annual.csv", mode="w")
 
 
+# %%
+'''
+extract arctic dem from .tar.gz
+'''
+# inputpath = r"H:\AU\topography\dem\zip\SW"
+# outputpath = r"H:\AU\topography\dem\unzip\SW"
+# os.chdir(inputpath)
+
+# filepath = glob.glob('*.{}'.format('gz'))
+# # %%
+# for f in filepath:
+#     # open file
+#     file = tarfile.open(f)
+#     # extracting file
+#     file.extractall(outputpath)
+#     file.close()
 # %%
