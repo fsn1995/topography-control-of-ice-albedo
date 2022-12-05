@@ -16,6 +16,7 @@ topodf.distance = topodf.dist / 1000;
 slope = normalize(topodf.slope, 'range', [0 1]);
 aspect = normalize(topodf.aspect, 'range', [0 1]);
 elevation = normalize(topodf.elevation, 'range', [0 1]);
+distance = normalize(topodf.distance, 'range', [0 1]);
 
 % %% pca analysis
 % [coeff,score,latent,tsquared,explained,mu] = pca([elevation aspect slope]);
@@ -27,7 +28,7 @@ elevation = normalize(topodf.elevation, 'range', [0 1]);
 %% split data 
 
 % df = table(gpuArray(slope), gpuArray(aspect), gpuArray(elevation));
-df = table(slope, aspect, elevation);
+df = table(slope, aspect, elevation, distance);
 % df = table(score(:,1), score(:,2));
 
 cvpt = cvpartition(topodf.iceclass, "HoldOut", 0.3);
@@ -44,15 +45,15 @@ testLabel = topodf.iceclass(testId);
 
 
 %% training model
-options = struct("Optimizer","asha", "UseParallel",true);
-[Mdl,OptimizationResults] = fitcauto(trainData, trainLabel, "Learners","auto",...
-    "HyperparameterOptimizationOptions",options);
-
-mdlPred = string(predict(Mdl, testData));
-mdlLoss = loss(Mdl, testData, testLabel);
-fprintf("model loss rate is: %.4f \n", mdlLoss);
-figure;
-confusionchart(testLabel, mdlPred);
+% options = struct("Optimizer","asha", "UseParallel",true);
+% [Mdl,OptimizationResults] = fitcauto(trainData, trainLabel, "Learners","auto",...
+%     "HyperparameterOptimizationOptions",options);
+% 
+% mdlPred = string(predict(Mdl, testData));
+% mdlLoss = loss(Mdl, testData, testLabel);
+% fprintf("model loss rate is: %.4f \n", mdlLoss);
+% figure;
+% confusionchart(testLabel, mdlPred);
 
 %% knn
 % fprintf("knn \n")
@@ -87,7 +88,7 @@ confusionchart(testLabel, mdlPred);
 % confusionchart(testLabel, mdlPred);
 % title("Naïve Bayes");
 % 
-% %% neural network
+%% neural network
 % fprintf("neural network \n")
 % mdl = fitcnet(trainData, trainLabel,"OptimizeHyperparameters","auto"); %"LayerSizes",[35 20]
 % 
@@ -109,19 +110,36 @@ confusionchart(testLabel, mdlPred);
 % confusionchart(testLabel, mdlPred);
 % title("svm");
 % 
-% %% random forest
-% fprintf("RF \n")
+%% random forest
+fprintf("RF \n")
+t = templateTree("Reproducible", true, "Surrogate", "on");
 % t = templateTree('NumVariablesToSample','all',...
 %     'PredictorSelection','interaction-curvature','Surrogate','on');
-% 
-% % mdl = fitcensemble(trainData, trainLabel, 'Method','Bag',...
-% %     'NumLearningCycles',200, 'Learners',t);
-% mdl = fitcensemble(trainData, trainLabel,"OptimizeHyperparameters", "auto");
-% 
-% mdlPred = string(predict(mdl, testData));
-% mdlLoss = loss(mdl, testData, testLabel);
-% fprintf("model loss rate is: %.4f \n", mdlLoss);
-% figure;
-% confusionchart(testLabel, mdlPred);
-% title("rf");
-% 
+options = struct("UseParallel",true);
+% [Mdl,OptimizationResults] = fitcauto(trainData, trainLabel, "Learners","auto",...
+%     "HyperparameterOptimizationOptions",options);
+% mdl = fitcensemble(trainData, trainLabel, 'Method','Bag',...
+%     'NumLearningCycles',200, 'Learners',t);
+mdl = fitcensemble(trainData, trainLabel,"OptimizeHyperparameters", "auto",...
+    "HyperparameterOptimizationOptions",options, "Learners", t);
+
+mdlPred = string(predict(mdl, testData));
+mdlLoss = loss(mdl, testData, testLabel);
+fprintf("model loss rate is: %.4f \n", mdlLoss);
+figure;
+confusionchart(testLabel, mdlPred);
+title("rf");
+
+impOOB = oobPermutedPredictorImportance(mdl);
+figure;
+bar(impOOB)
+title('Unbiased Predictor Importance Estimates')
+xlabel('Predictor variable')
+ylabel('Importance')
+h = gca;
+h.XTickLabel = mdl.PredictorNames;
+% h.XTickLabelRotation = 45;
+% h.TickLabelInterpreter = 'none';
+
+yHat = oobPredict(mdl);
+R2 = corr(mdl.Y, yHat)^2
