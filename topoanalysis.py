@@ -146,7 +146,7 @@ dfvx = vx.from_pandas(df)
 
 fig, ax = plt.subplots(figsize=(6,5))
 # ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
-ax.axvline(6.02642477064999, ls='--', linewidth=3)
+ax.axvline(9.57041446875, ls='--', linewidth=3)
 # ax.axhline(673.3710066, ls='--', linewidth=3)
 plt.xlim(0,90)
 plt.ylim(0,90)
@@ -156,7 +156,7 @@ fig.savefig("print/basin/SW_dark_dist_slop.png", dpi=300, bbox_inches="tight")
 
 fig, ax = plt.subplots(figsize=(6,5))
 # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-ax.axvline(6.02642477064999, ls='--', linewidth=3)
+ax.axvline(9.57041446875, ls='--', linewidth=3)
 # ax.axhline(673.3710066, ls='--', linewidth=3)
 plt.xlim(0,90)
 plt.ylim(0,2000)
@@ -183,7 +183,7 @@ index = df.albedo < 0.45
 df["ice_class"] = "bare ice"
 df.ice_class[index] = "dark ice"
 
-index = df.distance> 6.02642477064999
+index = df.distance> 9.57041446875
 df["dist_class"] = 'margin'
 df.dist_class[index] = 'inland'
 
@@ -212,7 +212,7 @@ plt.yticks(rotation="vertical", ha="right")
 #%%
 # fig, ax = plt.subplots(figsize=(6,5))
 # # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-# # ax.axvline(6.02642477064999, ls='--', linewidth=3)
+# # ax.axvline(9.57041446875, ls='--', linewidth=3)
 # plt.xlim(0,90)
 # plt.ylim(0,2000)
 # dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
@@ -221,14 +221,14 @@ plt.yticks(rotation="vertical", ha="right")
 
 # fig, ax = plt.subplots(figsize=(6,5))
 # # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-# ax.axvline(6.02642477064999, ls='--', linewidth=3)
+# ax.axvline(9.57041446875, ls='--', linewidth=3)
 # plt.xlim(0,90)
 # plt.ylim(0,90)
 # dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
 #                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')')
 # fig.savefig("print/basin/SW_bare_dist_slop.png", dpi=300, bbox_inches="tight")
 
-# index = df.distance> 6.02642477064999
+# index = df.distance> 9.57041446875
 # df["dist_class"] = 'margin'
 # df.dist_class[index] = 'inland'
 # fig, ax = plt.subplots(figsize=(6,5))
