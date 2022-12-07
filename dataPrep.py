@@ -123,9 +123,34 @@ for i in uniquei:
         dfmerge.to_csv("/data/shunan/data/topography/topomerge.csv", 
                         mode="a", index=False, header=False)
 
-
-#%% get montly average
+#%% estimate duration of bare ice
 df = pd.read_csv("/data/shunan/data/topography/topomerge.csv")
+df["datetime"] = pd.to_datetime(df.time_x, unit="ms")
+df["year"] = df.datetime.dt.year
+df["month"] = df.datetime.dt.month
+df["duration"] = np.nan
+
+uniquei = df.id.unique()
+
+for i in uniquei:
+    print("Processing No. %d" % i)
+    dfsub = df[df.id == i]
+    for y in dfsub.year.unique():
+        index = (dfsub.month>5) & (dfsub.month<10) & (dfsub.albedo<0.65)  & (dfsub.year == y)
+        if sum(index) == 0:
+            continue
+        dfsub.duration[index] = (dfsub[index].datetime.iloc[-1] - dfsub[index].datetime.iloc[0]).days
+
+    dfsub = dfsub.drop(columns = ['datetime', 'year', 'month'])
+    if i == 0:
+        dfsub.to_csv("/data/shunan/data/topography/topodata.csv", 
+                        mode="w", index=False, header=True)   
+    else:
+        dfsub.to_csv("/data/shunan/data/topography/topodata.csv", 
+                        mode="a", index=False, header=False)  
+
+#%% keep bare ice surface only
+df = pd.read_csv("/data/shunan/data/topography/topodata.csv")
 df["datetime"] = pd.to_datetime(df.time_x, unit="ms")
 df["year"] = df.datetime.dt.year
 df["month"] = df.datetime.dt.month
