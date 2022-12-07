@@ -136,7 +136,7 @@ for i in uniquei:
     print("Processing No. %d" % i)
     dfsub = df[df.id == i]
     for y in dfsub.year.unique():
-        index = (dfsub.month>5) & (dfsub.month<10) & (dfsub.albedo<0.65)  & (dfsub.year == y)
+        index = (dfsub.month>6) & (dfsub.month<9) & (dfsub.albedo<0.65)  & (dfsub.year == y)
         if sum(index) == 0:
             continue
         dfsub.duration[index] = (dfsub[index].datetime.iloc[-1] - dfsub[index].datetime.iloc[0]).days

@@ -86,7 +86,7 @@ for i in basin:
     fig, ax = plt.subplots(figsize=(6,4))
     ax.annotate(i, xy=(0.7, 0.1),  xycoords='axes fraction')
     ax.axhline(0.45, ls='--', linewidth=3)
-    plt.xlim(0, 120)
+    plt.xlim(0, 61)
     plt.ylim(0, 0.65)
     topo_dura_plot(i)
     fig.savefig("print/basin/" + i + "_dura.png", dpi=300, bbox_inches="tight")     
