@@ -262,6 +262,133 @@ dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=Tru
 fig.savefig("print/basin/SE_dark_dist_elev.png", dpi=300, bbox_inches="tight")
 
 #%%
+'''
+bare ice, duration and albedo, linear regression at SW
+'''
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+# df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
+df["distance"] = df.dist/1000
+df["datetime"] = pd.to_datetime(df.time_x, unit="ms")
+df["year"] = df.datetime.dt.year
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+index = df.year>2009
+df = df[index]
+
+fig, ax = plt.subplots(6, 1, figsize=(8,20))
+sns.lineplot(ax=ax[0], data=df, x="year", y="albedo", hue="ice_class")
+ax[0].legend(bbox_to_anchor=(0.9, 1.31), ncol=2)
+ax[0].set(xlabel="", ylabel="albedo", xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[4], data=df, x="year", y="elevation", hue="ice_class", legend=False)
+ax[4].set(xlabel="", ylabel="elevation (m a.s.l)", xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[2], data=df, x="year", y="distance", hue="ice_class", legend=False)
+ax[2].set(xlabel="", ylabel="distance (km)", xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[2], data=df, x="year", y="slope", hue="ice_class", legend=False)
+ax[2].set(xlabel="", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')', xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[3], data=df, x="year", y="aspect", hue="ice_class", legend=False)
+ax[3].set(xlabel="", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')', xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[5], data=df, x="year", y="duration", hue="ice_class", legend=False)
+ax[5].set(xlabel="", ylabel="duration (days)")
+fig.savefig("print/basin/SW_lineplot.png", dpi=300, bbox_inches="tight")
+
+df = df.groupby(["year", "ice_class"]).mean().reset_index()
+
+g=sns.lmplot(data=df, x="distance", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="distance (km)", ylabel="albedo")
+g.savefig("print/basin/SW_linear_dist.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="elevation", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="elevation (m a.s.l)", ylabel="albedo")
+g.savefig("print/basin/SW_linear_elev.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="slope", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="albedo")
+g.savefig("print/basin/SW_linear_slop.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="aspect", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="albedo")
+g.savefig("print/basin/SW_linear_aspe.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="duration", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="duration (days)", ylabel="albedo")
+g.savefig("print/basin/SW_linear_dura.png", dpi=300, bbox_inches="tight")
+#%%
+'''
+bare ice, duration and albedo, linear regression at SE
+'''
+df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
+# df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
+df["distance"] = df.dist/1000
+df["datetime"] = pd.to_datetime(df.time_x, unit="ms")
+df["year"] = df.datetime.dt.year
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+index = df.year>2009
+df = df[index]
+
+fig, ax = plt.subplots(6, 1, figsize=(8,20))
+sns.lineplot(ax=ax[0], data=df, x="year", y="albedo", hue="ice_class")
+ax[0].legend(bbox_to_anchor=(0.9, 1.31), ncol=2)
+ax[0].set(xlabel="", ylabel="albedo", xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[4], data=df, x="year", y="elevation", hue="ice_class", legend=False)
+ax[4].set(xlabel="", ylabel="elevation (m a.s.l)", xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[2], data=df, x="year", y="distance", hue="ice_class", legend=False)
+ax[2].set(xlabel="", ylabel="distance (km)", xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[2], data=df, x="year", y="slope", hue="ice_class", legend=False)
+ax[2].set(xlabel="", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')', xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[3], data=df, x="year", y="aspect", hue="ice_class", legend=False)
+ax[3].set(xlabel="", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')', xticklabels=[])
+# fig, ax = plt.subplots(figsize=(8,4))
+sns.lineplot(ax=ax[5], data=df, x="year", y="duration", hue="ice_class", legend=False)
+ax[5].set(xlabel="", ylabel="duration (days)")
+fig.savefig("print/basin/SE_lineplot.png", dpi=300, bbox_inches="tight")
+
+df = df.groupby(["year", "ice_class"]).mean().reset_index()
+
+g=sns.lmplot(data=df, x="distance", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="distance (km)", ylabel="albedo")
+g.savefig("print/basin/SE_linear_dist.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="elevation", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="elevation (m a.s.l)", ylabel="albedo")
+g.savefig("print/basin/SE_linear_elev.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="slope", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="albedo")
+g.savefig("print/basin/SE_linear_slop.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="aspect", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="albedo")
+g.savefig("print/basin/SE_linear_aspe.png", dpi=300, bbox_inches="tight")
+
+g=sns.lmplot(data=df, x="duration", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+ax=g.axes.flat
+ax[0].set(xlabel="duration (days)", ylabel="albedo")
+g.savefig("print/basin/SE_linear_dura.png", dpi=300, bbox_inches="tight")
+
+
+#%%
+
 # fig, ax = plt.subplots(figsize=(6,5))
 # # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
 # # ax.axvline(9.57041446875, ls='--', linewidth=3)
