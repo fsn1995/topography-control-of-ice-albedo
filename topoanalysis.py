@@ -4,6 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import vaex as vx
 import numpy as np
+import rasterio 
 sns.set_theme(style="darkgrid", font="Arial", font_scale=2)
 
 
@@ -390,7 +391,33 @@ g.savefig("print/basin/SE_linear_dura.png", dpi=300, bbox_inches="tight")
 
 
 #%%
+'''
+DEM analysis and plot
+'''
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SW_tif.tif")
+swdem = src.read(1)
+src.close()
+index = swdem < 0
+swdem[index] = np.nan
+swdem = swdem.flatten()
 
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SE_tif.tif")
+sedem = src.read(1)
+src.close()
+index = sedem < 0
+sedem[index] = np.nan
+sedem = sedem.flatten()
+df = pd.DataFrame({'swdem': pd.Series(swdem), 'sedem': pd.Series(sedem)})
+df = vx.from_pandas(df)
+
+fig, ax = plt.subplots(figsize=(6, 4))
+df.viz.histogram('sedem', label='SE')
+df.viz.histogram('swdem', label='SW')
+plt.legend()
+ax.set(xlabel="elevation (m a.s.l)")
+fig.savefig("print/elevhist.pdf", dpi=300, bbox_inches="tight")
+
+#%%
 # fig, ax = plt.subplots(figsize=(6,5))
 # # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
 # # ax.axvline(9.57041446875, ls='--', linewidth=3)
