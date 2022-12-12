@@ -411,12 +411,58 @@ df = pd.DataFrame({'swdem': pd.Series(swdem), 'sedem': pd.Series(sedem)})
 df = vx.from_pandas(df)
 
 fig, ax = plt.subplots(figsize=(6, 4))
+df.viz.histogram('sedem', what=vx.stat.count()*32*32/1000000, label='SE')
+df.viz.histogram('swdem', what=vx.stat.count()*32*32/1000000, label='SW')
+plt.legend()
+ax.set(xlabel="elevation (m a.s.l)", ylabel="area (km$^2$)")
+fig.savefig("print/elevhist.svg", dpi=300, bbox_inches="tight")
+
+
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SW_slope_tif.tif")
+swdem = src.read(1)
+src.close()
+index = swdem < 0
+swdem[index] = np.nan
+swdem = swdem.flatten()
+
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SE_slope_tif.tif")
+sedem = src.read(1)
+src.close()
+index = sedem < 0
+sedem[index] = np.nan
+sedem = sedem.flatten()
+df = pd.DataFrame({'swdem': pd.Series(swdem), 'sedem': pd.Series(sedem)})
+df = vx.from_pandas(df)
+
+fig, ax = plt.subplots(figsize=(6, 4))
 df.viz.histogram('sedem', label='SE')
 df.viz.histogram('swdem', label='SW')
 plt.legend()
-ax.set(xlabel="elevation (m a.s.l)")
-fig.savefig("print/elevhist.pdf", dpi=300, bbox_inches="tight")
+ax.set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')')
+fig.savefig("print/slophist.pdf", dpi=300, bbox_inches="tight")
 
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SW_aspect_tif.tif")
+swdem = src.read(1).astype(np.float32)
+src.close()
+index = swdem < 0
+swdem[index] = np.nan
+swdem = swdem.flatten()
+
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SE_aspect_tif.tif")
+sedem = src.read(1).astype(np.float32)
+src.close()
+index = sedem < 0
+sedem[index] = np.nan
+sedem = sedem.flatten()
+df = pd.DataFrame({'swdem': pd.Series(swdem), 'sedem': pd.Series(sedem)})
+df = vx.from_pandas(df)
+
+fig, ax = plt.subplots(figsize=(6, 4))
+df.viz.histogram('sedem', label='SE')
+df.viz.histogram('swdem', label='SW')
+plt.legend()
+ax.set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
+fig.savefig("print/aspehist.pdf", dpi=300, bbox_inches="tight")
 #%%
 # fig, ax = plt.subplots(figsize=(6,5))
 # # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
