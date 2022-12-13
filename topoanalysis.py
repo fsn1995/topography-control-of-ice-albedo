@@ -160,51 +160,53 @@ fig.savefig("print/basin/box_dura.png", dpi=300, bbox_inches="tight")
 
 
 #%%
-'''
-play with dark ice at SW
-'''
-df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
-df["distance"] = df.dist/1000
+# '''
+# play with dark ice at SW
+# '''
+# df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+# df["distance"] = df.dist/1000
 
-df = df[df.albedo < 0.45]
-df["tan"] = df.elevation / df.dist
-df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+# df = df[df.albedo < 0.45]
+# df["tan"] = df.elevation / df.dist
+# df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
 
-dfvx = vx.from_pandas(df)
+# dfvx = vx.from_pandas(df)
 
-fig, ax = plt.subplots(figsize=(6,5))
-# ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
-ax.axvline(9.57041446875, ls='--', linewidth=3)
-# ax.axhline(673.3710066, ls='--', linewidth=3)
-plt.xlim(0,90)
-plt.ylim(0,90)
-dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
-                 vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
-fig.savefig("print/basin/SW_dark_dist_slop.png", dpi=300, bbox_inches="tight")
+# fig, ax = plt.subplots(figsize=(6,5))
+# # ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+# ax.axvline(9.57041446875, ls='--', linewidth=3)
+# # ax.axhline(673.3710066, ls='--', linewidth=3)
+# plt.xlim(0,90)
+# plt.ylim(0,90)
+# dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
+#                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+# fig.savefig("print/basin/SW_dark_dist_slop.png", dpi=300, bbox_inches="tight")
 
-fig, ax = plt.subplots(figsize=(6,5))
-# ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-ax.axvline(9.57041446875, ls='--', linewidth=3)
-# ax.axhline(673.3710066, ls='--', linewidth=3)
-plt.xlim(0,90)
-plt.ylim(0,2000)
-dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
-                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m a.s.l)")
-fig.savefig("print/basin/SW_dark_dist_elev.png", dpi=300, bbox_inches="tight")
+# fig, ax = plt.subplots(figsize=(6,5))
+# # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+# ax.axvline(9.57041446875, ls='--', linewidth=3)
+# # ax.axhline(673.3710066, ls='--', linewidth=3)
+# plt.xlim(0,90)
+# plt.ylim(0,2000)
+# dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+#                  vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m a.s.l)")
+# fig.savefig("print/basin/SW_dark_dist_elev.png", dpi=300, bbox_inches="tight")
 
 
-fig, ax = plt.subplots(figsize=(6,5))   
-ax.axvline(9.57041446875, ls='--', linewidth=3)
-# ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
-plt.xlim(0, 90)
-plt.ylim(0, 360)
-dfvx.viz.heatmap('distance', 'aspect', what=np.log(vx.stat.count()), show=True,
-                  xlabel="distance (km)", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
-fig.savefig("print/basin/SW_dark_dist_aspe.png", dpi=300, bbox_inches="tight")
+# fig, ax = plt.subplots(figsize=(6,5))   
+# ax.axvline(9.57041446875, ls='--', linewidth=3)
+# # ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+# plt.xlim(0, 90)
+# plt.ylim(0, 360)
+# dfvx.viz.heatmap('distance', 'aspect', what=np.log(vx.stat.count()), show=True,
+#                   xlabel="distance (km)", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
+# fig.savefig("print/basin/SW_dark_dist_aspe.png", dpi=300, bbox_inches="tight")
 
 
 #%%
-'''slope and ice albedo'''
+'''
+ice at margin and inland comparison (SW)
+'''
 
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
 df["distance"] = df.dist/1000
@@ -216,28 +218,22 @@ index = df.distance> 9.57041446875
 df["dist_class"] = 'margin'
 df.dist_class[index] = 'inland'
 
-fig, ax = plt.subplots(figsize=(6,3))
-sns.boxplot(
-    data=df,
-    x="slope",
-    y="dist_class",
-    hue="ice_class"
-)
-ax.set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="")
-plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
-plt.yticks(rotation="vertical", ha="right")
-fig.savefig("print/basin/SW_slop_distclass.png", dpi=300, bbox_inches="tight")
-
-fig, ax = plt.subplots(figsize=(6,3))
-sns.boxplot(
-    data=df,
-    x="aspect",
-    y="dist_class",
-    hue="ice_class"
-)
-ax.set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="")
-plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
-plt.yticks(rotation="vertical", ha="right")
+fig, ax = plt.subplots(1, 3, figsize=(12,3))
+sns.boxplot(ax=ax[0], data=df, x="elevation", y="dist_class", hue="ice_class")
+ax[0].set(xlabel="elevation (m a.s.l)", ylabel="")
+ax[0].get_legend().remove()
+ax[0].annotate("a)", xy=(-0.15, 0.9),  xycoords='axes fraction')
+sns.boxplot(ax=ax[1], data=df, x="slope", y="dist_class", hue="ice_class")
+ax[1].set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="", yticklabels=[])
+sns.move_legend(ax[1], "upper center", bbox_to_anchor=(0.5, 1.35), ncol=2, title=None)
+ax[1].annotate("b)", xy=(-0.15, 0.9),  xycoords='axes fraction')
+# plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
+# plt.yticks(rotation="vertical", ha="right")
+sns.boxplot(ax=ax[2], data=df, x="aspect", y="dist_class", hue="ice_class")
+ax[2].set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="", yticklabels=[])
+ax[2].get_legend().remove()
+ax[2].annotate("c)", xy=(-0.15, 0.9),  xycoords='axes fraction')
+fig.savefig("print/SW_classdist_box.pdf", dpi=300, bbox_inches="tight")
 
 #%%
 '''
@@ -277,14 +273,18 @@ df.ice_class[index] = "dark ice"
 index = df.year>2009
 df = df[index]
 
-fig, ax = plt.subplots(5, 1, figsize=(8,16))
+index = df.distance <= 9.57041446875
+# index = df.distance > 9.57041446875
+df = df[index]
+
+fig, ax = plt.subplots(5, 1, figsize=(4,12))
 # sns.lineplot(ax=ax[0], data=df, x="year", y="albedo", hue="ice_class")
 # ax[0].legend(bbox_to_anchor=(0.9, 1.31), ncol=2)
 # ax[0].set(xlabel="", ylabel="albedo", xticklabels=[])
 # fig, ax = plt.subplots(figsize=(8,4))
 sns.lineplot(ax=ax[0], data=df, x="year", y="elevation", hue="ice_class")
 ax[0].set(xlabel="", ylabel="elevation (m a.s.l)", xticklabels=[])
-ax[0].legend(bbox_to_anchor=(0.9, 1.31), ncol=2)
+ax[0].legend(bbox_to_anchor=(1.1, 1.35), ncol=2)
 # fig, ax = plt.subplots(figsize=(8,4))
 sns.lineplot(ax=ax[3], data=df, x="year", y="distance", hue="ice_class", legend=False)
 ax[3].set(xlabel="", ylabel="distance (km)", xticklabels=[])
@@ -297,34 +297,34 @@ ax[2].set(xlabel="", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')', xticklabels=[
 # fig, ax = plt.subplots(figsize=(8,4))
 sns.lineplot(ax=ax[4], data=df, x="year", y="duration", hue="ice_class", legend=False)
 ax[4].set(xlabel="", ylabel="duration (days)")
-fig.savefig("print/basin/SW_lineplot.png", dpi=300, bbox_inches="tight")
+fig.savefig("print/basin/SW_margin_lineplot.png", dpi=300, bbox_inches="tight")
 
 df = df.groupby(["year", "ice_class"]).mean().reset_index()
 
-g=sns.lmplot(data=df, x="distance", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+g=sns.lmplot(data=df, x="distance", y="albedo", hue="ice_class", legend=False, height=2.4, aspect=1.2)
 ax=g.axes.flat
 ax[0].set(xlabel="distance (km)", ylabel="albedo")
-g.savefig("print/basin/SW_linear_dist.png", dpi=300, bbox_inches="tight")
+g.savefig("print/basin/SW_margin_linear_dist.png", dpi=300, bbox_inches="tight")
 
-g=sns.lmplot(data=df, x="elevation", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+g=sns.lmplot(data=df, x="elevation", y="albedo", hue="ice_class", legend=False, height=2.4, aspect=1.2)
 ax=g.axes.flat
 ax[0].set(xlabel="elevation (m a.s.l)", ylabel="albedo")
-g.savefig("print/basin/SW_linear_elev.png", dpi=300, bbox_inches="tight")
+g.savefig("print/basin/SW_margin_linear_elev.png", dpi=300, bbox_inches="tight")
 
-g=sns.lmplot(data=df, x="slope", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+g=sns.lmplot(data=df, x="slope", y="albedo", hue="ice_class", legend=False, height=2.4, aspect=1.2)
 ax=g.axes.flat
 ax[0].set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="albedo")
-g.savefig("print/basin/SW_linear_slop.png", dpi=300, bbox_inches="tight")
+g.savefig("print/basin/SW_margin_linear_slop.png", dpi=300, bbox_inches="tight")
 
-g=sns.lmplot(data=df, x="aspect", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+g=sns.lmplot(data=df, x="aspect", y="albedo", hue="ice_class", legend=False, height=2.4, aspect=1.2)
 ax=g.axes.flat
 ax[0].set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="albedo")
-g.savefig("print/basin/SW_linear_aspe.png", dpi=300, bbox_inches="tight")
+g.savefig("print/basin/SW_margin_linear_aspe.png", dpi=300, bbox_inches="tight")
 
-g=sns.lmplot(data=df, x="duration", y="albedo", hue="ice_class", legend=False, height=4, aspect=1)
+g=sns.lmplot(data=df, x="duration", y="albedo", hue="ice_class", legend=False, height=2.4, aspect=1.2)
 ax=g.axes.flat
 ax[0].set(xlabel="duration (days)", ylabel="albedo")
-g.savefig("print/basin/SW_linear_dura.png", dpi=300, bbox_inches="tight")
+g.savefig("print/basin/SW_margin_linear_dura.png", dpi=300, bbox_inches="tight")
 #%%
 '''
 bare ice, duration and albedo, linear regression at SE

@@ -30,7 +30,7 @@ df[index].describe().to_csv("stat/Sbasin_stat.csv", mode="a")
 '''
 Linear regression annual:
 '''
-df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
 df["distance"] = df.dist/1000
 df["datetime"] = pd.to_datetime(df.time_x, unit="ms")
 df["year"] = df.datetime.dt.year
@@ -39,11 +39,13 @@ df["ice_class"] = "bare ice"
 df.ice_class[index] = "dark ice"
 index = df.year>2009
 df = df[index]
+# index = df.distance <= 9.57041446875
+index = df.distance > 9.57041446875
+df = df[index]
+
 df = df.groupby(["year", "ice_class"]).mean().reset_index()
 
 dfstat = df[df.ice_class == "dark ice"]
-slope, intercept, r_value, p_value, std_err = stats.linregress(dfstat.distance.values, dfstat.albedo.values)
-print('distance: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,intercept,r_value,p_value))
 
 slope, intercept, r_value, p_value, std_err = stats.linregress(dfstat.elevation.values, dfstat.albedo.values)
 print('elevation: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,intercept,r_value,p_value))
@@ -53,6 +55,9 @@ print('slope: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,inter
 
 slope, intercept, r_value, p_value, std_err = stats.linregress(dfstat.aspect.values, dfstat.albedo.values)
 print('aspect: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,intercept,r_value,p_value))
+
+slope, intercept, r_value, p_value, std_err = stats.linregress(dfstat.distance.values, dfstat.albedo.values)
+print('distance: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,intercept,r_value,p_value))
 
 slope, intercept, r_value, p_value, std_err = stats.linregress(dfstat.duration.values, dfstat.albedo.values)
 print('duration: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,intercept,r_value,p_value))
