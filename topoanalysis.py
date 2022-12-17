@@ -160,50 +160,6 @@ fig.savefig("print/basin/box_dura.png", dpi=300, bbox_inches="tight")
 
 
 #%%
-# '''
-# play with dark ice at SW
-# '''
-# df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
-# df["distance"] = df.dist/1000
-
-# df = df[df.albedo < 0.45]
-# df["tan"] = df.elevation / df.dist
-# df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
-
-# dfvx = vx.from_pandas(df)
-
-# fig, ax = plt.subplots(figsize=(6,5))
-# # ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
-# ax.axvline(9.57041446875, ls='--', linewidth=3)
-# # ax.axhline(673.3710066, ls='--', linewidth=3)
-# plt.xlim(0,90)
-# plt.ylim(0,90)
-# dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
-#                  vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
-# fig.savefig("print/basin/SW_dark_dist_slop.png", dpi=300, bbox_inches="tight")
-
-# fig, ax = plt.subplots(figsize=(6,5))
-# # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-# ax.axvline(9.57041446875, ls='--', linewidth=3)
-# # ax.axhline(673.3710066, ls='--', linewidth=3)
-# plt.xlim(0,90)
-# plt.ylim(0,2000)
-# dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
-#                  vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m a.s.l)")
-# fig.savefig("print/basin/SW_dark_dist_elev.png", dpi=300, bbox_inches="tight")
-
-
-# fig, ax = plt.subplots(figsize=(6,5))   
-# ax.axvline(9.57041446875, ls='--', linewidth=3)
-# # ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
-# plt.xlim(0, 90)
-# plt.ylim(0, 360)
-# dfvx.viz.heatmap('distance', 'aspect', what=np.log(vx.stat.count()), show=True,
-#                   xlabel="distance (km)", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
-# fig.savefig("print/basin/SW_dark_dist_aspe.png", dpi=300, bbox_inches="tight")
-
-
-#%%
 '''
 ice at margin and inland comparison (SW)
 '''
@@ -234,29 +190,6 @@ ax[2].set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="", yticklabels=[
 ax[2].get_legend().remove()
 ax[2].annotate("c)", xy=(-0.15, 0.9),  xycoords='axes fraction')
 fig.savefig("print/SW_classdist_box.pdf", dpi=300, bbox_inches="tight")
-
-#%%
-'''
-play with dark ice at SE
-'''
-df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
-df["distance"] = df.dist/1000
-
-df = df[df.albedo < 0.45]
-df["tan"] = df.elevation / df.dist
-df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
-
-dfvx = vx.from_pandas(df)
-
-fig, ax = plt.subplots(figsize=(6,5))
-# ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
-# ax.axvline(9.57041446875, ls='--', linewidth=3)
-# ax.axhline(673.3710066, ls='--', linewidth=3)
-plt.xlim(0,90)
-plt.ylim(0,2000)
-dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
-                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m a.s.l)")
-fig.savefig("print/basin/SE_dark_dist_elev.png", dpi=300, bbox_inches="tight")
 
 #%%
 '''
@@ -463,6 +396,95 @@ df.viz.histogram('swdem', label='SW')
 plt.legend()
 ax.set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
 fig.savefig("print/aspehist.pdf", dpi=300, bbox_inches="tight")
+
+
+
+#%%
+'''
+play with dark ice at SW
+'''
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+df["distance"] = df.dist/1000
+
+df = df[df.albedo < 0.45]
+df["tan"] = df.elevation / df.dist
+df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+
+dfvx = vx.from_pandas(df)
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+ax.axvline(9.57041446875, ls='--', linewidth=3)
+# ax.axhline(673.3710066, ls='--', linewidth=3)
+plt.xlim(0,90)
+plt.ylim(0,90)
+dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+fig.savefig("print/basin/SW_dark_dist_slop.png", dpi=300, bbox_inches="tight")
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
+ax.axvline(9.57041446875, ls='--', linewidth=3)
+# ax.axhline(673.3710066, ls='--', linewidth=3)
+plt.xlim(0,90)
+plt.ylim(0,2000)
+dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m a.s.l)")
+fig.savefig("print/basin/SW_dark_dist_elev.png", dpi=300, bbox_inches="tight")
+
+
+fig, ax = plt.subplots(figsize=(6,5))   
+ax.axvline(9.57041446875, ls='--', linewidth=3)
+ax.annotate("SW", xy=(0.8, 0.8),  xycoords='axes fraction')
+plt.xlim(0, 90)
+plt.ylim(0, 360)
+dfvx.viz.heatmap('distance', 'aspect', what=np.log(vx.stat.count()), show=True,
+                  vmin=0, vmax=3, xlabel="distance (km)", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
+fig.savefig("print/basin/SW_dark_dist_aspe.png", dpi=300, bbox_inches="tight")
+
+#%%
+'''
+play with dark ice at SE
+'''
+df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
+df["distance"] = df.dist/1000
+
+df = df[df.albedo < 0.45]
+df["tan"] = df.elevation / df.dist
+df["arctan"] = np.rad2deg(np.arctan2(df.elevation, df.dist))
+
+dfvx = vx.from_pandas(df)
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
+ax.axvline(2.63818006441, ls='--', linewidth=3)
+# ax.axhline(673.3710066, ls='--', linewidth=3)
+plt.xlim(0,90)
+plt.ylim(0,90)
+dfvx.viz.heatmap('distance', 'slope', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=6, xlabel="distance (km)", ylabel="slope (" + u'\N{DEGREE SIGN}' + ')' )
+fig.savefig("print/basin/SE_dark_dist_slop.png", dpi=300, bbox_inches="tight")
+
+fig, ax = plt.subplots(figsize=(6,5))
+ax.annotate("SE", xy=(0.8, 0.1),  xycoords='axes fraction')
+ax.axvline(2.63818006441, ls='--', linewidth=3)
+# ax.axhline(673.3710066, ls='--', linewidth=3)
+plt.xlim(0,90)
+plt.ylim(0,2000)
+dfvx.viz.heatmap('distance', 'elevation', what=np.log(vx.stat.count()), show=True,
+                 vmin=0, vmax=4, xlabel="distance (km)", ylabel="elevation (m a.s.l)")
+fig.savefig("print/basin/SE_dark_dist_elev.png", dpi=300, bbox_inches="tight")
+
+
+fig, ax = plt.subplots(figsize=(6,5))   
+ax.axvline(2.63818006441, ls='--', linewidth=3)
+ax.annotate("SE", xy=(0.8, 0.8),  xycoords='axes fraction')
+plt.xlim(0, 90)
+plt.ylim(0, 360)
+dfvx.viz.heatmap('distance', 'aspect', what=np.log(vx.stat.count()), show=True,
+                  vmin=0, vmax=3, xlabel="distance (km)", ylabel="aspect (" + u'\N{DEGREE SIGN}' + ')')
+fig.savefig("print/basin/SE_dark_dist_aspe.png", dpi=300, bbox_inches="tight")
+
 #%%
 # fig, ax = plt.subplots(figsize=(6,5))
 # # ax.annotate("SW", xy=(0.8, 0.1),  xycoords='axes fraction')
