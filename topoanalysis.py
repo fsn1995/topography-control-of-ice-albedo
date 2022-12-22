@@ -30,7 +30,7 @@ def topo_elev_plot(basin):
 
 def topo_slop_plot(basin):
     df = pd.read_csv("/data/shunan/data/topography/basin/" + basin + "_annual.csv")
-    df["logslope"] = np.log(df.slope)
+    # df["logslope"] = np.log(df.slope)
     df = vx.from_pandas(df)
     df.viz.heatmap('slope', 'albedo', what=np.log(vx.stat.count()), show=True,
                     vmin=0, vmax=5, xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="albedo")

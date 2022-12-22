@@ -66,7 +66,7 @@ print('duration: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,in
 
 #%% SW dist-ice class stats
 '''
-inland ice slope
+Are slopes of inland and margin ice different?
 '''
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
 df["distance"] = df.dist/1000
@@ -74,16 +74,121 @@ index = df.albedo < 0.45
 df["ice_class"] = "bare ice"
 df.ice_class[index] = "dark ice"
 
-index = df.distance> 6.02642477064999
+index = df.distance> 9.57041446875
 df["dist_class"] = 'margin'
 df.dist_class[index] = 'inland'
 
+# slope of inland ice
 dftest = df[df.dist_class == "inland"]
 
-print("Compute the Wilcoxon rank-sum statistic for inland ice \n")
 ranksums(
     x=dftest.slope[dftest.ice_class == "dark ice"], 
     y=dftest.slope[dftest.ice_class == "bare ice"]   ,
+    alternative='greater'
+)
+ranksums(
+    x=dftest.aspect[dftest.ice_class == "dark ice"], 
+    y=dftest.aspect[dftest.ice_class == "bare ice"]   ,
+    alternative='greater'
+)
+
+# slope of margin ice
+dftest = df[df.dist_class == "margin"]
+
+print("Compute the Wilcoxon rank-sum statistic for margin ice \n")
+ranksums(
+    x=dftest.slope[dftest.ice_class == "dark ice"], 
+    y=dftest.slope[dftest.ice_class == "bare ice"]   ,
+    alternative='greater'
+)
+ranksums(
+    x=dftest.aspect[dftest.ice_class == "dark ice"], 
+    y=dftest.aspect[dftest.ice_class == "bare ice"]   ,
     alternative='less'
+)
+# %%
+'''
+how many random points generated?
+'''
+df = pd.read_csv("/data/shunan/data/topography/topomerge.csv")
+
+print("total number of SW basin is: %d"% len(df[df.basin == "SW"].id.unique()))
+print("total number of SE basin is: %d"% len(df[df.basin == "SE"].id.unique()))
+# %%
+'''
+percentage of dark ice per region?
+'''
+
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+print("percentage of dark ice at SW is %.4f"% (sum(index)/len(index)))
+
+df = pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+print("percentage of dark ice at SE is %.4f"% (sum(index)/len(index)))
+# %% 
+'''
+statistics of toporelation fig
+'''
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
+df["distance"] = df.dist/1000
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+
+# slope
+ranksums(
+    x=df.slope[(df.ice_class == "dark ice") & (df.basin == "SE")], 
+    y=df.slope[(df.ice_class == "dark ice") & (df.basin == "SW")]   ,
+    alternative='greater'
+)
+ranksums(
+    x=df.slope[(df.ice_class == "bare ice") & (df.basin == "SE")], 
+    y=df.slope[(df.ice_class == "bare ice") & (df.basin == "SW")]   ,
+    alternative='greater'
+)
+ranksums(
+    x=df.slope[(df.ice_class == "bare ice") & (df.basin == "SW")], 
+    y=df.slope[(df.ice_class == "dark ice") & (df.basin == "SW")]   ,
+    alternative='less'
+)
+
+# aspect
+ranksums(
+    x=df.aspect[(df.ice_class == "dark ice") & (df.basin == "SE")], 
+    y=df.aspect[(df.ice_class == "dark ice") & (df.basin == "SW")]   ,
+    alternative='less'
+)
+ranksums(
+    x=df.aspect[(df.ice_class == "bare ice") & (df.basin == "SE")], 
+    y=df.aspect[(df.ice_class == "bare ice") & (df.basin == "SW")]   ,
+    alternative='less'
+)
+ranksums(
+    x=df.aspect[(df.ice_class == "bare ice") & (df.basin == "SW")], 
+    y=df.aspect[(df.ice_class == "dark ice") & (df.basin == "SW")]   ,
+    alternative='greater'
+)
+ranksums(
+    x=df.aspect[(df.ice_class == "bare ice") & (df.basin == "SE")], 
+    y=df.aspect[(df.ice_class == "dark ice") & (df.basin == "SE")]   ,
+    alternative='greater'
+)
+
+
+#duration
+ranksums(
+    x=df.duration[(df.ice_class == "dark ice") & (df.basin == "SE")], 
+    y=df.duration[(df.ice_class == "dark ice") & (df.basin == "SW")]   ,
+    alternative='two-sided'
+)
+stat, p = stats.levene(
+    df.duration[(df.ice_class == "dark ice") & (df.basin == "SE")],
+    df.duration[(df.ice_class == "dark ice") & (df.basin == "SW")]
 )
 # %%
