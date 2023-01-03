@@ -179,6 +179,7 @@ sns.boxenplot(ax=ax[0], data=df, x="elevation", y="dist_class", hue="ice_class")
 ax[0].set(xlabel="elevation (m a.s.l)", ylabel="")
 ax[0].get_legend().remove()
 ax[0].annotate("a)", xy=(-0.15, 0.9),  xycoords='axes fraction')
+ax[0].set_xticks([0, 1000, 2000]);  # Set text labels.
 sns.boxenplot(ax=ax[1], data=df, x="slope", y="dist_class", hue="ice_class")
 ax[1].set(xlabel="slope (" + u'\N{DEGREE SIGN}' + ')', ylabel="", yticklabels=[])
 sns.move_legend(ax[1], "upper center", bbox_to_anchor=(0.5, 1.35), ncol=2, title=None)
@@ -189,6 +190,7 @@ sns.boxenplot(ax=ax[2], data=df, x="aspect", y="dist_class", hue="ice_class")
 ax[2].set(xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')', ylabel="", yticklabels=[])
 ax[2].get_legend().remove()
 ax[2].annotate("c)", xy=(-0.15, 0.9),  xycoords='axes fraction')
+ax[2].set_xticks([0, 90, 180, 270, 360]);  # Set text labels.
 fig.savefig("print/SW_classdist_box.pdf", dpi=300, bbox_inches="tight")
 
 #%%

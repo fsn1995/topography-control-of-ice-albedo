@@ -2,6 +2,9 @@
 import pandas as pd
 from scipy.stats import ranksums
 from scipy import stats
+import vaex as vx
+import numpy as np
+import rasterio 
 #%%
 '''
 South GrIS statistics
@@ -191,4 +194,50 @@ stat, p = stats.levene(
     df.duration[(df.ice_class == "dark ice") & (df.basin == "SE")],
     df.duration[(df.ice_class == "dark ice") & (df.basin == "SW")]
 )
+# %%
+'''dem related'''
+
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SW_tif.tif")
+swdem = src.read(1)
+src.close()
+index = swdem < 0
+swdem[index] = np.nan
+swdem = swdem.flatten()
+
+src = rasterio.open("/data/shunan/data/topography/dem/clip/Clip_OutRaster_SE_tif.tif")
+sedem = src.read(1)
+src.close()
+index = sedem < 0
+sedem[index] = np.nan
+sedem = sedem.flatten()
+df = pd.DataFrame({'swdem': pd.Series(swdem), 'sedem': pd.Series(sedem)})
+df = vx.from_pandas(df)
+
+'''areas below the snowline in SW and SE'''
+print('ratio of ice surface in SW: %.3f '% (len(df[df.swdem<1550]) / df.swdem.count()))
+print('total area in SW: %d km2'% (df.swdem.count()*32*32/1000000 ))
+print('ratio of ice surface in SE: %.3f '% (len(df[df.sedem<1453]) / df.sedem.count()))
+print('total area in SE: %d km2'% (df.sedem.count()*32*32/1000000 ))
+
+# #%% elevation distance gradient
+# df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+# df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
+# df["distance"] = df.dist/1000
+# index = df.albedo < 0.45 
+# df["ice_class"] = "bare ice"
+# df.ice_class[index] = "dark ice"
+
+# df = vx.from_pandas(df)
+
+# df[df.basin=="SW"].viz.heatmap(np.log(df[df.basin=="SW"].distance), "elevation", what=np.log(vx.stat.count()), show=True)
+# slope, intercept, r_value, p_value, std_err = stats.linregress(
+#     np.log(df[df.basin=="SW"].distance.values), df[df.basin=="SW"].elevation.values
+# )
+# print('elevation: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,intercept,r_value,p_value))
+
+# df[df.basin=="SE"].viz.heatmap("distance", "elevation", what=np.log(vx.stat.count()), show=True)
+# slope, intercept, r_value, p_value, std_err = stats.linregress(
+#     df[df.basin=="SE"].distance.values, df[df.basin=="SE"].elevation.values
+# )
+# print('elevation: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,intercept,r_value,p_value))
 # %%
