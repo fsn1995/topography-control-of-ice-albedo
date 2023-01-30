@@ -108,7 +108,8 @@ sns.boxplot(
     data=df,
     x="slope",
     hue="ice_class",
-    y="basin"
+    y="basin",
+    notch=True
 )
 plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
 ax.set(ylabel="", xlabel="slope (" + u'\N{DEGREE SIGN}' + ')')
@@ -119,7 +120,8 @@ sns.boxplot(
     data=df,
     x="elevation",
     hue="ice_class",
-    y="basin"
+    y="basin",
+    notch=True
 )
 plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
 ax.set(ylabel="", xlabel="elevation (m a.s.l)" )
@@ -130,7 +132,8 @@ sns.boxplot(
     data=df,
     x="distance",
     hue="ice_class",
-    y="basin"
+    y="basin",
+    notch=True
 )
 plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
 ax.set(ylabel="", xlabel="distance (km)" )
@@ -141,7 +144,8 @@ sns.boxplot(
     data=df,
     x="aspect",
     hue="ice_class",
-    y="basin"
+    y="basin",
+    notch=True
 )
 plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
 ax.set(ylabel="", xlabel="aspect (" + u'\N{DEGREE SIGN}' + ')' )
@@ -152,7 +156,8 @@ sns.boxplot(
     data=df,
     x="duration",
     hue="ice_class",
-    y="basin"
+    y="basin",
+    notch=True
 )
 plt.legend(bbox_to_anchor=(1.04, 1.31), ncol=2)
 ax.set(ylabel="", xlabel="duration (days)")
