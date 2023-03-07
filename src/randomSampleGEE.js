@@ -1,5 +1,5 @@
 /*
-One way of generating random sampling points. It's efficient but kdoes not consider
+One way of generating random sampling points. It's efficient but does not consider
 spatial auto correlation.
 */
 
