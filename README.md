@@ -8,17 +8,21 @@ This is part of a manuscript that will be under review (hopefully).
 - [src/randomSampleBuffer.js](src/randomSampleBuffer.js)
 - [src/randomSampleDEMAlbedo.py](src\randomSampleDEMAlbedo.py)
 
-Both the harmonized satellite albedo and the ArcticDEM were extracted using the generated random sampling points. 
+Both the harmonized satellite albedo and the ArcticDEM were extracted ([src/randomSampleBuffer.js](src/randomSampleBuffer.js)) using the generated random sampling points ([src/randomSampleDEMAlbedo.py](src\randomSampleDEMAlbedo.py)
+). 
 
-Functions for random sampling with buffer were made by Noel Gorelick and were modfied to adapt to our methodology. Ref: https://medium.com/google-earth/random-samples-with-buffering-6c8737384f8c
-
+Functions for random sampling with buffer were made by Noel Gorelick and were modfied to adapt to our methodology. It runs in the earth engine code editor. Ref: https://medium.com/google-earth/random-samples-with-buffering-6c8737384f8c
+The extraction of albedo and ArcticDEM are using EE's python api via geemap. 
 ## Data analysis
 - [src/dataPrep.py](src/dataPrep.py)
 - [src/topoanalysis.py](src/topoanalysis.py)
 - [src/topoStats.py](src/topoStats.py)
 - [src/topoDarkIceRF.m](src/topoDarkIceRF.m)
 
-The extracted albedo and dem data were further analyzed in this section.
+The extracted albedo and dem data were further analyzed in this section. More detail can be found in the manuscript. 
+The shapefiles of the generated random sampling points, contour lines, and the basins are all available in the [src/shp](src/shp) folder.
+
+## Citation
 
 ```
 |   README.md
