@@ -97,6 +97,31 @@ for i in basin:
     topo_dura_plot(i)
     fig.savefig("print/basin/" + i + "_dura.png", dpi=300, bbox_inches="tight")     
 
+#%% test duration and albedo
+df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
+df["distance"] = df.dist/1000
+index = df.albedo < 0.45 
+df["ice_class"] = "bare ice"
+df.ice_class[index] = "dark ice"
+index = df.year>2009
+df = df[index]
+dfcount = df.groupby(['year','ice_class']).size().reset_index(name='counts')
+dfcount1 = dfcount[dfcount.ice_class == "bare ice"]
+dfcount2 = dfcount[dfcount.ice_class == "dark ice"]
+dfcount = dfcount1
+dfcount["dark_ratio"] = dfcount2.counts.values / dfcount1.counts.values
+#%%
+sns.boxplot(data=df, x="year", y="duration")
+sns.scatterplot(data=dfcount, x="year", y="dark_ratio")
+#%%
+sns.boxplot(data=df, x="year", y="albedo")
+
+#%%
+sns.boxplot(data=df[df["ice_class"]=="dark ice"], x="year", y="duration")
+
+#%%
+sns.boxplot(data=df[df["ice_class"]=="dark ice"], x="year", y="albedo")
 #%%
 '''
 topo histogram by basin
