@@ -1,3 +1,9 @@
+'''
+Scripts for analyzing and plotting the geo-topographical and phenological data.
+More details can be found in the paper.
+
+Shunan Feng (shunan.feng@envs.au.dk)
+'''
 #%% import
 import pandas as pd
 import seaborn as sns

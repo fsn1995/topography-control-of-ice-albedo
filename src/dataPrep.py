@@ -1,3 +1,10 @@
+'''
+This script is used to prepare data for the analysis.
+The extracted DEM products and albedo products are joined together.
+The shapefile is the random sampling points exported from GEE. 
+
+Shunan Feng (shunan.feng@envs.au.dk)
+'''
 #%%
 # import vaex as vx
 import pandas as pd

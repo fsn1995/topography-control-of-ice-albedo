@@ -1,3 +1,10 @@
+'''
+Scripts to compute statistics of the geo-topographical and phenological data. 
+More details can be found in the paper.
+
+Author: Shunan Feng (shunan.feng@envs.au.dk)
+
+'''
 #%%
 import pandas as pd
 from scipy.stats import ranksums

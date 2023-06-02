@@ -1,3 +1,6 @@
+/*
+This is an experiment script that derives surface roughness from the DEM.
+*/
 var roi = ee.FeatureCollection("projects/ee-deeppurple/assets/icePoly");
 var greenlandmask = ee.Image('OSU/GIMP/2000_ICE_OCEAN_MASK')
                    .select('ice_mask').eq(1); // #'ice_mask', 'ocean_mask'    
