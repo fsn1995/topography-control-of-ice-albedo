@@ -2,7 +2,9 @@
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Ffsn1995%2Ftopography-control-of-ice-albedo&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 # Analysis of geo-topographic and phenological controls on the spatial distribution of dark ice on the Greenland Ice Sheet
 
-This is part of a manuscript that is submitted for peer review.
+This is part of a manuscript that is submitted for peer review. The code is available for reproducibility.
+A web map is made to visualize the topographical dataset. The web map is available at https://storymaps.arcgis.com/stories/f52a6a97b8eb4c76af56d848dd5330bb.
+A brief description of the code is provided below.
 
 ## Albedo and ArcticDEM data extraction
 - [src/randomSampleBuffer.js](src/randomSampleBuffer.js)
