@@ -72,6 +72,7 @@ print('duration: \ny={0:.4f}x+{1:.4f}\nOLS_r:{2:.2f}, p:{3:.2f}'.format(slope,in
 Are slopes of inland and margin ice different?
 '''
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
+# df = df[df.albedo<=0.55]
 df["distance"] = df.dist/1000
 index = df.albedo < 0.45 
 df["ice_class"] = "bare ice"
@@ -139,6 +140,7 @@ statistics of toporelation fig
 '''
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
 df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
+df = df[df.albedo<=0.55]
 df["distance"] = df.dist/1000
 index = df.albedo < 0.45 
 df["ice_class"] = "bare ice"
