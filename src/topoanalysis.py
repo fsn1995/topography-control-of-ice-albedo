@@ -58,7 +58,7 @@ for i in basin:
     ax.annotate(i, xy=(0.7, 0.1),  xycoords='axes fraction')
     ax.axhline(0.45, ls='--', linewidth=3)
     plt.xlim(0, 100)
-    plt.ylim(0, 0.55)
+    plt.ylim(0, 0.65)
     plt.yticks([0.0, 0.2, 0.4], ['0.0', '0.2', '0.4']);  # Set text labels.
     topo_dist_plot(i)
     fig.savefig("print/basin/" + i + "_dist.png", dpi=300, bbox_inches="tight")
@@ -68,7 +68,7 @@ for i in basin:
     ax.annotate(i, xy=(0.7, 0.1),  xycoords='axes fraction')
     ax.axhline(0.45, ls='--', linewidth=3)
     plt.xlim(0, 2000)
-    plt.ylim(0, 0.55)
+    plt.ylim(0, 0.65)
     plt.yticks([0.0, 0.2, 0.4], ['0.0', '0.2', '0.4']);  # Set text labels.
     topo_elev_plot(i)
     fig.savefig("print/basin/" + i + "_elev.png", dpi=300, bbox_inches="tight")
@@ -78,7 +78,7 @@ for i in basin:
     ax.annotate(i, xy=(0.7, 0.1),  xycoords='axes fraction')
     ax.axhline(0.45, ls='--', linewidth=3)
     plt.xlim(0, 50)
-    plt.ylim(0, 0.55)
+    plt.ylim(0, 0.65)
     plt.yticks([0.0, 0.2, 0.4], ['0.0', '0.2', '0.4']);  # Set text labels.
     topo_slop_plot(i)
     fig.savefig("print/basin/" + i + "_slop.png", dpi=300, bbox_inches="tight")
@@ -88,7 +88,7 @@ for i in basin:
     ax.annotate(i, xy=(0.7, 0.1),  xycoords='axes fraction')
     ax.axhline(0.45, ls='--', linewidth=3)
     plt.xlim(0, 360)
-    plt.ylim(0, 0.55)
+    plt.ylim(0, 0.65)
     plt.yticks([0.0, 0.2, 0.4], ['0.0', '0.2', '0.4']);  # Set text labels.
     topo_aspe_plot(i)
     fig.savefig("print/basin/" + i + "_aspe.png", dpi=300, bbox_inches="tight")        
@@ -98,7 +98,7 @@ for i in basin:
     ax.annotate(i, xy=(0.7, 0.1),  xycoords='axes fraction')
     ax.axhline(0.45, ls='--', linewidth=3)
     plt.xlim(0, 61)
-    plt.ylim(0, 0.55)
+    plt.ylim(0, 0.65)
     plt.yticks([0.0, 0.2, 0.4], ['0.0', '0.2', '0.4']);  # Set text labels.
     topo_dura_plot(i)
     fig.savefig("print/basin/" + i + "_dura.png", dpi=300, bbox_inches="tight")     
@@ -109,8 +109,8 @@ topo histogram by basin
 '''
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
 df = pd.concat([df, pd.read_csv("/data/shunan/data/topography/basin/SE_annual.csv")])
-index = df.albedo <= 0.55
-df = df[index]
+# index = df.albedo <= 0.60
+# df = df[index]
 df["distance"] = df.dist/1000
 index = df.albedo < 0.45 
 df["ice_class"] = "bare ice"
@@ -183,8 +183,8 @@ ice at margin and inland comparison (SW)
 '''
 
 df = pd.read_csv("/data/shunan/data/topography/basin/SW_annual.csv")
-index = df.albedo <= 0.55
-df = df[index]
+# index = df.albedo <= 0.55
+# df = df[index]
 df["distance"] = df.dist/1000
 index = df.albedo < 0.45 
 df["ice_class"] = "bare ice"
