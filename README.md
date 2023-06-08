@@ -1,4 +1,4 @@
-[Reserved for doi badge]
+[![DOI](https://zenodo.org/badge/502836537.svg)](https://zenodo.org/badge/latestdoi/502836537)
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Ffsn1995%2Ftopography-control-of-ice-albedo&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 # Analysis of geo-topographic and phenological controls on the spatial distribution of dark ice on the Greenland Ice Sheet
 
