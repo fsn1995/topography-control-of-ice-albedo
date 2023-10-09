@@ -1,8 +1,8 @@
 
-
 %% load data
 topodf = readtable("H:\AU\topography\basin\SW_annual.csv");
-% topodf = readtable("/data/shunan/data/topography/basin/SE_annual.csv");
+% rf = rowfilter(topodf);
+% topodf = topodf(rf.albedo<0.55, :);
 topodf.iceclass = repmat("bare ice", length(topodf.albedo) , 1);
 index = topodf.albedo < 0.45;
 topodf.iceclass(index) = repmat("dark ice", sum(index) , 1);
@@ -14,8 +14,6 @@ aspect = normalize(topodf.aspect, 'range', [0 1]);
 elevation = normalize(topodf.elevation, 'range', [0 1]);
 distance = normalize(topodf.distance, 'range', [0 1]);
 duration = normalize(topodf.duration, 'range', [0 1]);
-
-
 
 %% split data 
 
@@ -34,26 +32,37 @@ trainLabel = topodf.iceclass(trainId);
 testData = df(testId,:);
 testLabel = topodf.iceclass(testId);
 
-
 %% training model
 % SW 
-t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 30);
-mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
-     "Learners", t, "NumLearningCycles", 28);
 
-% %SE 0.2668  0.2716 
-% t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 24);
-% mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
-%      "Learners", t, "NumLearningCycles", 59);
+for i = 1:10
+    t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 30);
+    mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
+         "Learners", t, "NumLearningCycles", 28);
 
-mdlPred = string(predict(mdl, testData));
-mdlLoss = loss(mdl, testData, testLabel);
-fprintf("model loss rate is: %.4f \n", mdlLoss);
+    % %SE 0.2668  0.2716 
+    % t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 24);
+    % mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
+    %      "Learners", t, "NumLearningCycles", 59);
+
+    mdlPred = string(predict(mdl, testData));
+    mdlLoss = loss(mdl, testData, testLabel);
+    fprintf("model loss rate is: %.4f \n", mdlLoss);
 
 
-impOOB = oobPermutedPredictorImportance(mdl);
+    impOOB = oobPermutedPredictorImportance(mdl);
 
+    if i==1
+        writematrix(impOOB, "SWimportance.csv", "WriteMode","overwrite");
+    else
+        writematrix(impOOB, "SWimportance040055.csv", "WriteMode","append");
+    end
+end
 
+%% plotting 
+df = readmatrix("SWimportance.csv");
+impOOB = mean(df);
+stderr = std(df);
 f=figure;
 set(f,'Position',[200 200 1200 300])
 
@@ -66,7 +75,12 @@ b.CData = [0 0.4470 0.7410
            0.9290 0.6940 0.1250
            0.4940 0.1840 0.5560
            0.3010 0.7450 0.9330];
-title('a) SW')
+hold on
+er = errorbar(impOOB, stderr);    
+er.Color = [0 0 0];                            
+er.LineStyle = 'none';  
+
+title(ax1, 'a) SW');
 % xlabel('Predictors')
 ylabel('Importance')
 h = gca;
@@ -80,11 +94,14 @@ ax2.Colormap = [0 0.4470 0.7410
                0.9290 0.6940 0.1250
                0.4940 0.1840 0.5560
                0.3010 0.7450 0.9330];
-title(ax1, 'a) SW')
+title(ax2, 'b) SW');
 
+df = df./(sum(df, 2));
+stderr = std(df);
 %% load data
 topodf = readtable("H:\AU\topography\basin\SE_annual.csv");
-% topodf = readtable("/data/shunan/data/topography/basin/SE_annual.csv");
+% rf = rowfilter(topodf);
+% topodf = topodf(rf.albedo<0.55, :);
 topodf.iceclass = repmat("bare ice", length(topodf.albedo) , 1);
 index = topodf.albedo < 0.45;
 topodf.iceclass(index) = repmat("dark ice", sum(index) , 1);
@@ -119,25 +136,36 @@ testLabel = topodf.iceclass(testId);
 
 
 %% training model
-% SW 
-t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 30);
-mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
-     "Learners", t, "NumLearningCycles", 28);
+% SE 
 
-% %SE 0.2668  0.2716 
-% t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 24);
-% mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
-%      "Learners", t, "NumLearningCycles", 59);
+for i = 1:10
+    t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 30);
+    mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
+         "Learners", t, "NumLearningCycles", 28);
 
-mdlPred = string(predict(mdl, testData));
-mdlLoss = loss(mdl, testData, testLabel);
-fprintf("model loss rate is: %.4f \n", mdlLoss);
+    % %SE 0.2668  0.2716 
+    % t = templateTree("Reproducible", true, "Surrogate", "on", "MinLeafSize", 24);
+    % mdl = fitcensemble(trainData, trainLabel,"Method", "Bag",...
+    %      "Learners", t, "NumLearningCycles", 59);
 
-
-impOOB = oobPermutedPredictorImportance(mdl);
-
+    mdlPred = string(predict(mdl, testData));
+    mdlLoss = loss(mdl, testData, testLabel);
+    fprintf("model loss rate is: %.4f \n", mdlLoss);
 
 
+    impOOB = oobPermutedPredictorImportance(mdl);
+
+    if i==1
+        writematrix(impOOB, "SEimportance.csv", "WriteMode","overwrite");
+    else
+        writematrix(impOOB, "SEimportance.csv", "WriteMode","append");
+    end
+end
+
+%% plotting
+df = readmatrix("SEimportance.csv");
+impOOB = mean(df);
+stderr = std(df);
 ax3 = nexttile;
 
 b = bar(impOOB,'FaceColor','flat');
@@ -146,7 +174,12 @@ b.CData = [0 0.4470 0.7410
            0.9290 0.6940 0.1250
            0.4940 0.1840 0.5560
            0.3010 0.7450 0.9330];
-title('c) SE')
+hold on
+er = errorbar(impOOB, stderr);    
+er.Color = [0 0 0];                            
+er.LineStyle = 'none';  
+
+title(ax3, 'c) SE')
 ylabel('Importance')
 h = gca;
 h.XTickLabel = mdl.PredictorNames;
@@ -160,10 +193,11 @@ ax4.Colormap = [0 0.4470 0.7410
                0.9290 0.6940 0.1250
                0.4940 0.1840 0.5560
                0.3010 0.7450 0.9330];
-title('d) SE')
+title(ax4, 'd) SE')
 tilefig.TileSpacing = 'compact';
 tilefig.Padding = 'compact';
 fontsize(f, scale=1.2)
-exportgraphics(tilefig, 'print/rfpredictor.pdf', 'Resolution',300);
+% exportgraphics(tilefig, 'print/rfpredictor.pdf', 'Resolution',300);
 
-
+df = df./(sum(df, 2));
+stderr = std(df);
